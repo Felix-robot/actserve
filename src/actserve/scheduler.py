@@ -9,6 +9,7 @@ from typing import Literal
 
 from .backend import InferenceBackend
 from .metrics import SchedulerMetrics
+from .profiler import StageProfiler
 from .types import InferenceRequest, RequestOutcome, ResultStatus
 
 
@@ -49,10 +50,12 @@ class Scheduler:
         config: SchedulerConfig | None = None,
         *,
         metrics: SchedulerMetrics | None = None,
+        profiler: StageProfiler | None = None,
     ) -> None:
         self.backend = backend
         self.config = config or SchedulerConfig()
         self.metrics = metrics or SchedulerMetrics()
+        self.profiler = profiler
         self._condition = asyncio.Condition()
         self._heap: list[_Envelope] = []
         self._pending_by_session: dict[tuple[str, str], _Envelope] = {}
@@ -206,6 +209,8 @@ class Scheduler:
         for envelope in remaining:
             heapq.heappush(self._heap, envelope)
         self.metrics.record_dispatch(len(selected))
+        if self.profiler is not None:
+            self.profiler.observe("scheduler.batch_size", len(selected), unit="items")
         return selected
 
     def _predicted_latency_ns(self, batch_size: int) -> int | None:
@@ -221,8 +226,14 @@ class Scheduler:
 
     async def _execute(self, batch: list[_Envelope]) -> None:
         requests = [envelope.request for envelope in batch]
+        started_ns = time.perf_counter_ns()
         try:
             actions = list(await self.backend.infer_batch(requests))
+            if self.profiler is not None:
+                self.profiler.duration(
+                    "backend.infer",
+                    (time.perf_counter_ns() - started_ns) / 1_000_000,
+                )
             if len(actions) != len(batch):
                 raise RuntimeError(
                     f"backend returned {len(actions)} actions for a batch of {len(batch)} requests"
@@ -240,6 +251,7 @@ class Scheduler:
                         "to the wrong request or robot session"
                     )
                 now = time.monotonic_ns()
+                self._record_action_profile(action)
                 if now > envelope.request.deadline_ns:
                     self._finish(
                         envelope,
@@ -255,6 +267,11 @@ class Scheduler:
                         completed_ns=now,
                     )
         except Exception as exc:  # backend failures become per-request outcomes
+            if self.profiler is not None:
+                self.profiler.duration(
+                    "backend.infer_failed",
+                    (time.perf_counter_ns() - started_ns) / 1_000_000,
+                )
             now = time.monotonic_ns()
             for envelope in batch:
                 self._finish(
@@ -332,4 +349,18 @@ class Scheduler:
             replaced_by_request_id=replaced_by_request_id,
         )
         self.metrics.record_outcome(outcome)
+        if self.profiler is not None:
+            if outcome.queue_ms is not None:
+                self.profiler.duration("scheduler.queue", outcome.queue_ms)
+            self.profiler.duration("scheduler.end_to_end", outcome.end_to_end_ms)
         envelope.future.set_result(outcome)
+
+    def _record_action_profile(self, action) -> None:
+        if self.profiler is None:
+            return
+        for key, value in action.metadata.items():
+            if not key.endswith("_ms") or isinstance(value, bool):
+                continue
+            if isinstance(value, int | float):
+                name = key.removesuffix("_ms").replace("_", ".")
+                self.profiler.duration(f"action.{name}", float(value))
