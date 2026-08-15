@@ -13,6 +13,7 @@ from .metrics import MetricsSnapshot, SchedulerMetrics
 from .profiler import ProfileMetric, ProfileSnapshot, StageProfiler
 from .scheduler import Scheduler, SchedulerConfig
 from .training_profiler import TrainingPhaseMetric, TrainingProfiler, TrainingProfileSnapshot
+from .training_tuner import TrainingTrial, TuningDecision, generate_sweep, select_training_trial
 from .types import ActionChunk, InferenceRequest, RequestOutcome, ResultStatus
 
 __all__ = [
@@ -37,6 +38,10 @@ __all__ = [
     "TrainingPhaseMetric",
     "TrainingProfiler",
     "TrainingProfileSnapshot",
+    "TrainingTrial",
+    "TuningDecision",
+    "generate_sweep",
+    "select_training_trial",
 ]
 
 __version__ = "0.5.0"

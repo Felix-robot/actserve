@@ -49,6 +49,7 @@ uv run actserve benchmark --sessions 8 --observations 20
 uv run actserve benchmark-async
 uv run actserve benchmark-serial
 uv run actserve profile --gpu 0 -- python your_workload.py
+uv run actserve tune-training examples/training_trials.json
 uv run pytest
 ```
 
