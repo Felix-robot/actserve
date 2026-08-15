@@ -8,9 +8,10 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.6 adds privacy-safe training bottleneck analysis and evidence-based tuning
-> to the serving profiler, asynchronous action queue, and public benchmark
-> harness. It does not send hardware commands or claim task superiority.
+> v0.7 adds shared-backbone adapter routing and residency planning to the
+> privacy-safe training/serving profiler, asynchronous action queue, and public
+> benchmark harness. It does not send hardware commands or claim task
+> superiority.
 
 Formal experiments must follow the explicit staged gate in
 [`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md); public benchmark
