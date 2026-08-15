@@ -21,6 +21,7 @@ closed-loop serving system needs:
 
 - persistent robot sessions;
 - asynchronous action queues with explicit low-watermark refill;
+- explicit shared-backbone and multi-adapter routing;
 - monotonic per-observation deadlines;
 - earliest-deadline-first scheduling;
 - pending-frame coalescing per session;
@@ -178,6 +179,10 @@ For dependency-free data-wait, compute, optimizer, and checkpoint timing, see
 [`docs/TRAINING_PROFILER.md`](docs/TRAINING_PROFILER.md). It stores numeric
 timings only and reports optimization hypotheses that still require isolated
 workload validation.
+
+For task adapters that share one loaded backbone, see
+[`docs/ADAPTER_ROUTING.md`](docs/ADAPTER_ROUTING.md). Mixed-adapter batching is
+opt-in and remains partitioned by backbone and input signature.
 
 ## Roadmap
 

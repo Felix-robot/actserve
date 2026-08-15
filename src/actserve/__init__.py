@@ -8,6 +8,7 @@ from .action_queue import (
     AsyncActionQueue,
     QueuedAction,
 )
+from .adapter_backend import AdapterBackend, AdapterRoute, RoutedRequest
 from .backend import InferenceBackend
 from .metrics import MetricsSnapshot, SchedulerMetrics
 from .profiler import ProfileMetric, ProfileSnapshot, StageProfiler
@@ -22,6 +23,8 @@ __all__ = [
     "ActionQueueConfig",
     "ActionQueueEmpty",
     "ActionQueueSnapshot",
+    "AdapterBackend",
+    "AdapterRoute",
     "AsyncActionQueue",
     "InferenceBackend",
     "InferenceRequest",
@@ -30,6 +33,7 @@ __all__ = [
     "ProfileSnapshot",
     "QueuedAction",
     "RequestOutcome",
+    "RoutedRequest",
     "ResultStatus",
     "Scheduler",
     "SchedulerConfig",
