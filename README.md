@@ -44,8 +44,14 @@ The scheduler core has no runtime dependencies. Python 3.10+ is supported.
 uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
 uv run actserve benchmark-serial
+uv run actserve profile --gpu 0 -- python your_workload.py
 uv run pytest
 ```
+
+`actserve profile` records process wall time plus optional GPU utilization,
+memory, and power samples. Command arguments are redacted unless
+`--include-command` is explicitly supplied, and model inputs/outputs are never
+captured.
 
 On a CUDA machine with PyTorch already installed, run the public synthetic
 vision-policy benchmark:
