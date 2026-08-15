@@ -73,3 +73,33 @@ routing an action to the wrong session.
 Do not attach the adapter to an active experiment merely because the protocol
 test passes. Transport correctness, scheduling gain, model parity, and
 closed-loop task gain are separate gates.
+
+## Live public-checkpoint benchmark
+
+`benchmarks/embodied_cpp_live.py` compares the unmodified serial endpoint with
+ActServe on the same synthetic arrival trace and public checkpoint. It reports
+latest-frame deadline success separately from total completions because a
+robot benefits from a fresh action, not from finishing every stale frame.
+
+First generate the Python protocol module from the matching Embodied.cpp
+checkout, then run the benchmark against a dedicated server port:
+
+```bash
+protoc -I /path/to/Embodied.cpp \
+  --python_out=/tmp/embodied-proto \
+  /path/to/Embodied.cpp/serving/vla.proto
+
+uv run --extra embodied-cpp python benchmarks/embodied_cpp_live.py \
+  --proto-python-dir /tmp/embodied-proto \
+  --address tcp://127.0.0.1:5592
+```
+
+The benchmark uses fixed synthetic images, state, tokens, and action noise. It
+calibrates its action-parity tolerance from repeated direct requests because
+the CUDA runtime may not be bitwise deterministic. A parity failure means the
+ActServe-routed action differs by more than 1.5 times the observed direct
+repeatability envelope.
+
+This benchmark establishes transport correctness and overload freshness. It
+does not establish task success, policy quality, or a closed-loop robotics
+gain; those require a separately controlled evaluation.

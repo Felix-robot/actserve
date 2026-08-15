@@ -151,11 +151,12 @@ uv run actserve benchmark-serial
 
 See [`docs/EMBODIED_CPP.md`](docs/EMBODIED_CPP.md). The serial benchmark is a
 scheduler-only simulation and is not evidence of real-model speed or task
-success.
+success. The guide also includes a live public-checkpoint benchmark that
+measures latest-frame deadline success against the same unmodified server.
 
 ## Roadmap
 
-- Reproducible same-model Embodied.cpp comparison on a public checkpoint.
+- Repeat the public-checkpoint overload comparison across more VLA families.
 - Session-aware vision-feature cache with explicit invalidation.
 - Multi-adapter routing and residency policy.
 - gRPC transport and Prometheus exporter.

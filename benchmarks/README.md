@@ -1,5 +1,34 @@
 # Public benchmark results
 
+## Live Embodied.cpp pi0.5 overload comparison — 2026-08-16
+
+This benchmark used Embodied.cpp commit `c5a96a2` with its public pi0.5 LIBERO
+GGUF checkpoint on a shared NVIDIA A800-SXM4-80GB. Both arms used the same
+loaded model, precision, synthetic observations, fixed action noise, serial
+ZeroMQ endpoint, and four-session arrival trace.
+
+Across three repetitions, direct FIFO executed all 16 requests and delivered
+zero of the four latest session frames before their deadlines. ActServe
+executed five requests, replaced 11 stale pending frames, and delivered all
+four latest frames on time in every repetition. Action deltas stayed within a
+tolerance calibrated from the unmodified server's own repeated-request CUDA
+variation; every run recorded zero parity failures.
+
+| Run | Direct latest on time | ActServe latest on time | Direct calls | ActServe calls | Replaced |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0/4 | 4/4 | 16 | 5 | 11 |
+| 2 | 0/4 | 4/4 | 16 | 5 | 11 |
+| 3 | 0/4 | 4/4 | 16 | 5 | 11 |
+
+Raw result: [`results/a800_embodied_cpp_pi05_live_20260816.json`](results/a800_embodied_cpp_pi05_live_20260816.json)
+
+SHA-256: `149164bb13fba7472e7f909206b5cc53a817489eb7d18e8993e5ed2863a2a7f4`
+
+This is real-model evidence for overload freshness and avoided stale compute.
+It does not measure policy quality or closed-loop task success. The GPU was
+shared with pre-existing workloads, but both benchmark arms ran against the
+same isolated server without changing those workloads.
+
 ## Serial embodied-runtime scheduling simulation — 2026-08-15
 
 This dependency-free benchmark models the current Embodied.cpp VLA serving
