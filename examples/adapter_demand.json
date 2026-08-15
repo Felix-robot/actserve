@@ -1,0 +1,22 @@
+{
+  "adapters": [
+    {
+      "adapter": "pick-lora",
+      "size_mb": 256,
+      "requests_per_minute": 120,
+      "cold_load_ms": 85
+    },
+    {
+      "adapter": "place-lora",
+      "size_mb": 256,
+      "requests_per_minute": 90,
+      "cold_load_ms": 85
+    },
+    {
+      "adapter": "rare-task-lora",
+      "size_mb": 384,
+      "requests_per_minute": 5,
+      "cold_load_ms": 110
+    }
+  ]
+}

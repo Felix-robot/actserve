@@ -9,6 +9,7 @@ from .action_queue import (
     QueuedAction,
 )
 from .adapter_backend import AdapterBackend, AdapterRoute, RoutedRequest
+from .adapter_planner import AdapterDemand, AdapterResidencyPlan, plan_adapter_residency
 from .backend import InferenceBackend
 from .metrics import MetricsSnapshot, SchedulerMetrics
 from .profiler import ProfileMetric, ProfileSnapshot, StageProfiler
@@ -24,6 +25,8 @@ __all__ = [
     "ActionQueueEmpty",
     "ActionQueueSnapshot",
     "AdapterBackend",
+    "AdapterDemand",
+    "AdapterResidencyPlan",
     "AdapterRoute",
     "AsyncActionQueue",
     "InferenceBackend",
@@ -45,6 +48,7 @@ __all__ = [
     "TrainingTrial",
     "TuningDecision",
     "generate_sweep",
+    "plan_adapter_residency",
     "select_training_trial",
 ]
 

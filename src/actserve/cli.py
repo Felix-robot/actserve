@@ -4,6 +4,7 @@ import argparse
 import sys
 
 from . import __version__
+from .adapter_planner import main as adapter_planner_main
 from .async_benchmark import main as async_benchmark_main
 from .benchmark import main as benchmark_main
 from .cuda_benchmark import main as cuda_benchmark_main
@@ -24,6 +25,8 @@ def main(argv: list[str] | None = None) -> int:
         return serial_benchmark_main(argv[1:])
     if argv and argv[0] == "profile":
         return profile_main(argv[1:])
+    if argv and argv[0] == "plan-adapters":
+        return adapter_planner_main(argv[1:])
     if argv and argv[0] == "tune-training":
         return training_tuner_main(argv[1:])
     parser = argparse.ArgumentParser(prog="actserve")
@@ -33,7 +36,7 @@ def main(argv: list[str] | None = None) -> int:
         nargs="?",
         help=(
             "available commands: benchmark, benchmark-async, benchmark-cuda, "
-            "benchmark-serial, profile, tune-training"
+            "benchmark-serial, plan-adapters, profile, tune-training"
         ),
     )
     args = parser.parse_args(argv)
