@@ -12,6 +12,7 @@ from .backend import InferenceBackend
 from .metrics import MetricsSnapshot, SchedulerMetrics
 from .profiler import ProfileMetric, ProfileSnapshot, StageProfiler
 from .scheduler import Scheduler, SchedulerConfig
+from .training_profiler import TrainingPhaseMetric, TrainingProfiler, TrainingProfileSnapshot
 from .types import ActionChunk, InferenceRequest, RequestOutcome, ResultStatus
 
 __all__ = [
@@ -33,6 +34,9 @@ __all__ = [
     "SchedulerConfig",
     "SchedulerMetrics",
     "StageProfiler",
+    "TrainingPhaseMetric",
+    "TrainingProfiler",
+    "TrainingProfileSnapshot",
 ]
 
 __version__ = "0.5.0"

@@ -29,6 +29,7 @@ closed-loop serving system needs:
 - latency-aware batch admission when the backend supplies an estimator;
 - explicit expired, replaced, missed, and failed outcomes;
 - privacy-safe scheduling traces;
+- privacy-safe training phase and bottleneck profiling;
 - backend-neutral integration;
 - fail-closed action identity validation across request, session, and sequence.
 
@@ -171,6 +172,11 @@ For decoupled action-chunk inference and execution, see
 [`docs/ASYNC_ACTIONS.md`](docs/ASYNC_ACTIONS.md). The queue fails closed on
 underrun and leaves robot-specific fallback commands outside the generic
 runtime.
+
+For dependency-free data-wait, compute, optimizer, and checkpoint timing, see
+[`docs/TRAINING_PROFILER.md`](docs/TRAINING_PROFILER.md). It stores numeric
+timings only and reports optimization hypotheses that still require isolated
+workload validation.
 
 ## Roadmap
 
