@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "actserve"
+version = "0.1.0"
+description = "Deadline-aware inference serving for embodied AI agents."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "ActServe contributors" }]
+keywords = ["robotics", "embodied-ai", "vla", "wam", "inference", "serving"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Felix-robot/actserve"
+Repository = "https://github.com/Felix-robot/actserve"
+Issues = "https://github.com/Felix-robot/actserve/issues"
+
+[project.optional-dependencies]
+server = ["fastapi>=0.115", "uvicorn>=0.30"]
+dev = [
+  "fastapi>=0.115",
+  "httpx>=0.28",
+  "pytest>=8.0",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.8",
+  "uvicorn>=0.30",
+]
+
+[project.scripts]
+actserve = "actserve.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/actserve"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
