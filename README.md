@@ -8,8 +8,9 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.4 is an alpha scheduler and public CUDA benchmark harness. It does not send
-> hardware commands or claim closed-loop task superiority.
+> v0.5 is an alpha serving profiler, asynchronous action queue, and public
+> benchmark harness. It does not send hardware commands or claim closed-loop
+> task superiority.
 
 ## The pain it solves
 
