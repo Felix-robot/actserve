@@ -1,0 +1,22 @@
+{
+  "schema": "actserve.serial_runtime_stability.v1",
+  "evidence": "scheduler-only serial-runtime simulation; no Embodied.cpp model or task-quality claim",
+  "runs": 5,
+  "workload": {
+    "sessions": 8,
+    "observations_per_session": 12,
+    "observation_hz": 30.0,
+    "deadline_ms": 80.0,
+    "backend_latency_ms": 15.0
+  },
+  "direct_fifo": {
+    "completed_on_time": [15, 15, 15, 15, 15],
+    "deadline_missed": [12, 12, 12, 12, 12],
+    "e2e_p95_ms": [85.4291332, 85.4904831, 85.4234168, 86.053092, 85.5093669]
+  },
+  "actserve_plus_serial_runtime": {
+    "completed_on_time": [26, 26, 27, 26, 27],
+    "deadline_missed": [0, 0, 0, 0, 0],
+    "e2e_p95_ms": [51.2844785, 51.66359375, 59.013392, 51.41765625, 54.4396625]
+  }
+}

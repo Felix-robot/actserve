@@ -21,6 +21,7 @@ class SchedulerConfig:
     coalesce_sessions: bool = True
     enforce_monotonic_sequence: bool = True
     drop_missed_actions: bool = True
+    drop_unserviceable_requests: bool = False
 
     def __post_init__(self) -> None:
         if self.max_batch_wait_ms < 0 or self.dispatch_guard_ms < 0:
@@ -140,6 +141,7 @@ class Scheduler:
                 while batch is None:
                     self._remove_inactive_locked()
                     self._expire_requests_locked()
+                    self._drop_unserviceable_requests_locked()
                     if not self._heap:
                         if not self._accepting:
                             return
@@ -269,6 +271,33 @@ class Scheduler:
                 envelope.active = False
                 self._clear_session_pointer(envelope)
                 self._finish(envelope, ResultStatus.EXPIRED, completed_ns=now)
+        self._remove_inactive_locked()
+
+    def _drop_unserviceable_requests_locked(self) -> None:
+        """Drop queued work that the backend predicts cannot meet its deadline.
+
+        This is opt-in because an estimator may be absent or intentionally
+        optimistic. A conservative backend estimator lets a serial runtime avoid
+        spending accelerator time on an action that will be discarded anyway.
+        """
+
+        if not self.config.drop_unserviceable_requests:
+            return
+        predicted_ns = self._predicted_latency_ns(1)
+        if predicted_ns is None:
+            return
+        now = time.monotonic_ns()
+        guard_ns = int(self.config.dispatch_guard_ms * 1_000_000)
+        for envelope in self._heap:
+            if envelope.active and now + predicted_ns + guard_ns > envelope.request.deadline_ns:
+                envelope.active = False
+                self._clear_session_pointer(envelope)
+                self._finish(
+                    envelope,
+                    ResultStatus.UNSERVICEABLE,
+                    completed_ns=now,
+                    error="backend latency estimate predicts a deadline miss",
+                )
         self._remove_inactive_locked()
 
     def _remove_inactive_locked(self) -> None:

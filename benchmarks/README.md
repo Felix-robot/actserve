@@ -1,5 +1,36 @@
 # Public benchmark results
 
+## Serial embodied-runtime scheduling simulation — 2026-08-15
+
+This dependency-free benchmark models the current Embodied.cpp VLA serving
+contract as a single-request serial backend. It does not load Embodied.cpp,
+model weights, simulator observations, or private data.
+
+Five repeated runs used 8 sessions, 12 observations/session, 30 Hz/session, an
+80 ms deadline, and 15 ms serial backend latency:
+
+- direct FIFO: 15/96 on-time actions in every run and 12 late dispatched
+  actions in every run;
+- ActServe + serial runtime: 26--27/96 on-time actions and zero late dispatched
+  actions in every run;
+- p95 end-to-end latency ranged from 85.42--86.05 ms for direct FIFO and
+  51.28--59.01 ms for the combined control plane.
+
+The apparent useful-action rate counts all incoming observations, including the
+65 stale frames that ActServe explicitly replaced. This result validates the
+scheduler mechanism under a serial overload model only. A superiority claim
+still requires a public Embodied.cpp checkpoint and identical real requests.
+
+Raw summary: [`results/serial_runtime_stability_20260815.json`](results/serial_runtime_stability_20260815.json)
+
+SHA-256: `e29f9145ce02144c5844b3902a10007efcb80f070e2ead656dc913ba76b4a6b8`
+
+Run it with:
+
+```bash
+actserve benchmark-serial
+```
+
 ## A100 synthetic vision policy — 2026-08-15
 
 This benchmark was executed on one NVIDIA A100-SXM4-80GB with PyTorch

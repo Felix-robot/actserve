@@ -1,6 +1,6 @@
 # Security and robot-safety policy
 
-ActServe v0.1 schedules inference requests. It does not provide motor
+ActServe schedules inference requests. It does not provide motor
 drivers, collision checking, watchdogs, emergency stops, or a complete robot
 safety system.
 

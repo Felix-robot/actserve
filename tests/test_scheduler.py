@@ -129,6 +129,19 @@ async def test_latency_estimator_prevents_harmful_batch() -> None:
     assert len(backend.calls[0]) == 1
 
 
+async def test_latency_estimator_can_drop_predicted_deadline_miss() -> None:
+    backend = SimulatedBackend(fixed_ms=20, per_item_ms=0)
+    config = SchedulerConfig(
+        max_batch_wait_ms=0,
+        dispatch_guard_ms=1,
+        drop_unserviceable_requests=True,
+    )
+    async with Scheduler(backend, config) as scheduler:
+        outcome = await scheduler.submit(request("robot", 0, timeout_ms=5))
+    assert outcome.status is ResultStatus.UNSERVICEABLE
+    assert backend.calls == []
+
+
 async def test_out_of_order_observation_is_rejected() -> None:
     backend = SimulatedBackend(fixed_ms=0, per_item_ms=0)
     async with Scheduler(backend, SchedulerConfig(max_batch_wait_ms=0)) as scheduler:

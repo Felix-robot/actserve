@@ -8,7 +8,7 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.3 is an alpha scheduler and public CUDA benchmark harness. It does not send
+> v0.4 is an alpha scheduler and public CUDA benchmark harness. It does not send
 > hardware commands or claim closed-loop task superiority.
 
 ## The pain it solves
@@ -43,6 +43,7 @@ The scheduler core has no runtime dependencies. Python 3.10+ is supported.
 ```bash
 uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
+uv run actserve benchmark-serial
 uv run pytest
 ```
 
@@ -134,13 +135,30 @@ The backend API is intentionally narrow. Proprietary models, camera data,
 prompts, action conventions, checkpoints, and experiment traces can live in a
 separate package. The default JSONL trace excludes observations and actions.
 
+## Embodied.cpp integration
+
+ActServe can sit in front of Embodied.cpp's serial ZeroMQ/Protobuf VLA server.
+Embodied.cpp keeps responsibility for portable C++ model execution; ActServe
+adds session coalescing, EDF ordering, admission control, response identity
+validation, and adaptive end-to-end latency estimation.
+
+Install the optional transport and follow the public integration guide:
+
+```bash
+uv sync --extra embodied-cpp
+uv run actserve benchmark-serial
+```
+
+See [`docs/EMBODIED_CPP.md`](docs/EMBODIED_CPP.md). The serial benchmark is a
+scheduler-only simulation and is not evidence of real-model speed or task
+success.
+
 ## Roadmap
 
-- Public real-model adapter and reproducible same-model comparison.
+- Reproducible same-model Embodied.cpp comparison on a public checkpoint.
 - Session-aware vision-feature cache with explicit invalidation.
 - Multi-adapter routing and residency policy.
 - gRPC transport and Prometheus exporter.
-- Backend adapter for a portable C++ embodied runtime.
 
 See [`docs/POSITIONING.md`](docs/POSITIONING.md) for the deliberately narrow
 comparison boundary and [`SECURITY.md`](SECURITY.md) before any physical-robot

@@ -6,6 +6,7 @@ import sys
 from . import __version__
 from .benchmark import main as benchmark_main
 from .cuda_benchmark import main as cuda_benchmark_main
+from .serial_benchmark import main as serial_benchmark_main
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -14,12 +15,14 @@ def main(argv: list[str] | None = None) -> int:
         return benchmark_main(argv[1:])
     if argv and argv[0] == "benchmark-cuda":
         return cuda_benchmark_main(argv[1:])
+    if argv and argv[0] == "benchmark-serial":
+        return serial_benchmark_main(argv[1:])
     parser = argparse.ArgumentParser(prog="actserve")
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
         "command",
         nargs="?",
-        help="available commands: benchmark, benchmark-cuda",
+        help="available commands: benchmark, benchmark-cuda, benchmark-serial",
     )
     args = parser.parse_args(argv)
     if args.command is None:

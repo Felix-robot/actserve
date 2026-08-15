@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "actserve"
-version = "0.3.0"
+version = "0.4.0"
 description = "Deadline-aware inference serving for embodied AI agents."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,6 +29,7 @@ Issues = "https://github.com/Felix-robot/actserve/issues"
 
 [project.optional-dependencies]
 server = ["fastapi>=0.115", "uvicorn>=0.30"]
+embodied-cpp = ["pyzmq>=26.0"]
 dev = [
   "fastapi>=0.115",
   "httpx>=0.28",

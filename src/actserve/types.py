@@ -12,6 +12,7 @@ class ResultStatus(str, Enum):
     COMPLETED = "completed"
     DEADLINE_MISSED = "deadline_missed"
     EXPIRED = "expired_before_dispatch"
+    UNSERVICEABLE = "predicted_deadline_miss"
     REPLACED = "replaced_by_newer_observation"
     OUT_OF_ORDER = "out_of_order_observation"
     FAILED = "failed"

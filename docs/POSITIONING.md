@@ -4,12 +4,13 @@ ActServe is a control plane for continuous embodied inference. It is not a
 new tensor runtime and does not reimplement model kernels.
 
 Portable runtimes can remain the execution plane beneath an ActServe
-backend. The v0.1 differentiation is intentionally narrow and measurable:
+backend. The differentiation is intentionally narrow and measurable:
 
 - multiple persistent robot sessions;
 - per-observation deadlines and EDF scheduling;
 - explicit stale-frame coalescing;
 - latency-aware microbatch admission;
+- predicted-deadline-miss admission control for serial runtimes;
 - fail-closed action identity routing;
 - public scheduling and replay metrics.
 
