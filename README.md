@@ -19,6 +19,7 @@ and long-tail latency. ActServe adds the control-plane semantics that a
 closed-loop serving system needs:
 
 - persistent robot sessions;
+- asynchronous action queues with explicit low-watermark refill;
 - monotonic per-observation deadlines;
 - earliest-deadline-first scheduling;
 - pending-frame coalescing per session;
@@ -159,6 +160,11 @@ See [`docs/EMBODIED_CPP.md`](docs/EMBODIED_CPP.md). The serial benchmark is a
 scheduler-only simulation and is not evidence of real-model speed or task
 success. The guide also includes a live public-checkpoint benchmark that
 measures latest-frame deadline success against the same unmodified server.
+
+For decoupled action-chunk inference and execution, see
+[`docs/ASYNC_ACTIONS.md`](docs/ASYNC_ACTIONS.md). The queue fails closed on
+underrun and leaves robot-specific fallback commands outside the generic
+runtime.
 
 ## Roadmap
 
