@@ -48,3 +48,23 @@ SHA-256:
 This stress test shows deadline-aware batching under overload. It remains a
 synthetic-policy serving benchmark and is not evidence of closed-loop task
 success or superiority over another embodied runtime.
+
+## v0.3 automatic batch sweep — 2026-08-15
+
+The v0.3 sweep calibrated batch sizes 1–16 once, then evaluated candidate
+ceilings 4, 8, and 16 under the same 32-session, 60 Hz, 20 ms workload.
+
+| Batch ceiling | On-time actions | Backend calls | p95 |
+| ---: | ---: | ---: | ---: |
+| 4 | 373/640 | 117 | 20.02 ms |
+| 8 | 640/640 | 80 | 17.33 ms |
+| 16 | 640/640 | 40 | 12.43 ms |
+
+ActServe recommended 16 by its documented ordering: most on-time actions,
+then lower p95 latency, then fewer backend calls.
+
+Raw result:
+[`results/a100_v03_tune_4_8_16_20260815.json`](results/a100_v03_tune_4_8_16_20260815.json)
+
+SHA-256:
+`75f61466e8ac415c0be5f652eec56fc7a501cb707997f9d732876b805ffa9624`

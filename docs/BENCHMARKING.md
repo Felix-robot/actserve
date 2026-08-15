@@ -23,3 +23,7 @@ scheduler semantics and is not evidence of GPU or task-level superiority.
 synthetic ViT-style policy. It measures scheduler and batching behavior on real
 hardware, but it is still not a closed-loop task-success comparison against a
 production VLA/WAM runtime.
+
+Pass `--batch-sizes 4,8,16` to calibrate once and compare several batch ceilings
+under an identical workload. The recommendation prioritizes useful on-time
+actions, then lower p95 latency, then fewer backend calls.
