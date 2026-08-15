@@ -158,9 +158,7 @@ class AsyncActionQueue:
                     if self._closed:
                         raise ActionQueueClosed("action queue is closed")
                     await self._condition.wait()
-                action = self._actions.popleft()
-                self._served_actions += 1
-                self._record_depth_locked()
+                action = self._pop_locked()
                 self._condition.notify_all()
                 return action
 
@@ -171,10 +169,24 @@ class AsyncActionQueue:
                 action = await asyncio.wait_for(wait_for_action(), timeout_ms / 1000)
         except asyncio.TimeoutError as exc:
             async with self._condition:
-                self._underruns += 1
-                if self.profiler is not None:
-                    self.profiler.observe("action_queue.underrun", 1, unit="events")
+                self._record_underrun_locked()
             raise ActionQueueEmpty("no action available before timeout") from exc
+
+        if self.profiler is not None:
+            self.profiler.duration("action_queue.action_age", action.age_ms)
+        return action
+
+    async def get_nowait(self) -> QueuedAction:
+        """Return the next action immediately, or report an explicit underrun."""
+
+        async with self._condition:
+            if not self._actions:
+                if self._closed:
+                    raise ActionQueueClosed("action queue is closed")
+                self._record_underrun_locked()
+                raise ActionQueueEmpty("no action is currently available")
+            action = self._pop_locked()
+            self._condition.notify_all()
 
         if self.profiler is not None:
             self.profiler.duration("action_queue.action_age", action.age_ms)
@@ -239,3 +251,13 @@ class AsyncActionQueue:
         if self.profiler is not None:
             self.profiler.observe("action_queue.depth", len(self._actions), unit="actions")
 
+    def _pop_locked(self) -> QueuedAction:
+        action = self._actions.popleft()
+        self._served_actions += 1
+        self._record_depth_locked()
+        return action
+
+    def _record_underrun_locked(self) -> None:
+        self._underruns += 1
+        if self.profiler is not None:
+            self.profiler.observe("action_queue.underrun", 1, unit="events")

@@ -4,6 +4,7 @@ import argparse
 import sys
 
 from . import __version__
+from .async_benchmark import main as async_benchmark_main
 from .benchmark import main as benchmark_main
 from .cuda_benchmark import main as cuda_benchmark_main
 from .profile_cli import main as profile_main
@@ -14,6 +15,8 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "benchmark":
         return benchmark_main(argv[1:])
+    if argv and argv[0] == "benchmark-async":
+        return async_benchmark_main(argv[1:])
     if argv and argv[0] == "benchmark-cuda":
         return cuda_benchmark_main(argv[1:])
     if argv and argv[0] == "benchmark-serial":
@@ -25,7 +28,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "command",
         nargs="?",
-        help="available commands: benchmark, benchmark-cuda, benchmark-serial, profile",
+        help=(
+            "available commands: benchmark, benchmark-async, benchmark-cuda, "
+            "benchmark-serial, profile"
+        ),
     )
     args = parser.parse_args(argv)
     if args.command is None:

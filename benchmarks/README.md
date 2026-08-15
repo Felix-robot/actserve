@@ -1,5 +1,30 @@
 # Public benchmark results
 
+## Asynchronous action refill timing — 2026-08-16
+
+This dependency-free benchmark compares blocking chunk inference against
+ActServe's low-watermark asynchronous refill. Each of three repetitions used
+12 chunks of 10 actions, 80 ms synthetic inference, and a 20 ms action tick.
+
+| Loop | Mean wall time | Mean idle ticks | Max steady idle ticks |
+| --- | ---: | ---: | ---: |
+| Blocking | 3601.35 ms | 48 | 44 |
+| Async refill | 2664.27 ms | 3 | 0 |
+
+All six arms executed all 120 requested actions. This validates inference and
+action-execution overlap in a synthetic timing loop only; it is not evidence of
+closed-loop task success, model quality, or physical-robot safety.
+
+Raw result: [`results/async_action_queue_20260816.json`](results/async_action_queue_20260816.json)
+
+SHA-256: `aaabf72e62a137d9b73ddf4330f03fe1fcc1eca017d83e2a1006cf430f08a6c8`
+
+Run it with:
+
+```bash
+actserve benchmark-async
+```
+
 ## Live Embodied.cpp pi0.5 overload comparison — 2026-08-16
 
 This benchmark used Embodied.cpp commit `c5a96a2` with its public pi0.5 LIBERO

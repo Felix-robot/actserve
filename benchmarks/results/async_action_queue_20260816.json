@@ -1,0 +1,33 @@
+{
+  "schema": "actserve.async_benchmark.repetitions.v1",
+  "runs": [
+    {
+      "asynchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 3, "steady_idle_ticks": 0, "total_idle_ticks": 3, "wall_ms": 2667.4858749611303},
+      "config": {"chunk_size": 10, "chunks": 12, "inference_ms": 80, "low_watermark": 5, "tick_ms": 20},
+      "schema": "actserve.async_benchmark.v1",
+      "scope": "synthetic timing benchmark; not closed-loop task success",
+      "synchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 4, "steady_idle_ticks": 44, "total_idle_ticks": 48, "wall_ms": 3602.876207907684}
+    },
+    {
+      "asynchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 3, "steady_idle_ticks": 0, "total_idle_ticks": 3, "wall_ms": 2664.2446670448408},
+      "config": {"chunk_size": 10, "chunks": 12, "inference_ms": 80, "low_watermark": 5, "tick_ms": 20},
+      "schema": "actserve.async_benchmark.v1",
+      "scope": "synthetic timing benchmark; not closed-loop task success",
+      "synchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 4, "steady_idle_ticks": 44, "total_idle_ticks": 48, "wall_ms": 3592.4383339006454}
+    },
+    {
+      "asynchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 3, "steady_idle_ticks": 0, "total_idle_ticks": 3, "wall_ms": 2661.087583983317},
+      "config": {"chunk_size": 10, "chunks": 12, "inference_ms": 80, "low_watermark": 5, "tick_ms": 20},
+      "schema": "actserve.async_benchmark.v1",
+      "scope": "synthetic timing benchmark; not closed-loop task success",
+      "synchronous": {"actions_executed": 120, "inference_calls": 12, "startup_idle_ticks": 4, "steady_idle_ticks": 44, "total_idle_ticks": 48, "wall_ms": 3608.731749933213}
+    }
+  ],
+  "summary": {
+    "sync_wall_ms_mean": 3601.3487639138475,
+    "async_wall_ms_mean": 2664.272708663096,
+    "sync_idle_ticks_mean": 48,
+    "async_idle_ticks_mean": 3,
+    "async_steady_idle_ticks_max": 0
+  }
+}

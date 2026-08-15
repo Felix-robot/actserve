@@ -44,6 +44,7 @@ The scheduler core has no runtime dependencies. Python 3.10+ is supported.
 ```bash
 uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
+uv run actserve benchmark-async
 uv run actserve benchmark-serial
 uv run actserve profile --gpu 0 -- python your_workload.py
 uv run pytest
@@ -53,6 +54,10 @@ uv run pytest
 memory, and power samples. Command arguments are redacted unless
 `--include-command` is explicitly supplied, and model inputs/outputs are never
 captured.
+
+`actserve benchmark-async` uses a public synthetic timing loop to compare
+blocking chunk inference with low-watermark asynchronous refill. It demonstrates
+control-loop overlap only; it does not claim simulator or robot task success.
 
 On a CUDA machine with PyTorch already installed, run the public synthetic
 vision-policy benchmark:
