@@ -8,9 +8,9 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.5 is an alpha serving profiler, asynchronous action queue, and public
-> benchmark harness. It does not send hardware commands or claim closed-loop
-> task superiority.
+> v0.6 adds privacy-safe training bottleneck analysis and evidence-based tuning
+> to the serving profiler, asynchronous action queue, and public benchmark
+> harness. It does not send hardware commands or claim task superiority.
 
 ## The pain it solves
 
