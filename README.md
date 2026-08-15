@@ -47,6 +47,7 @@ The scheduler core has no runtime dependencies. Python 3.10+ is supported.
 ```bash
 uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
+uv run actserve benchmark-adapters
 uv run actserve benchmark-async
 uv run actserve benchmark-serial
 uv run actserve plan-adapters examples/adapter_demand.json --budget-mb 512

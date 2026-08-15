@@ -1,5 +1,31 @@
 # Public benchmark results
 
+## Shared-backbone adapter routing — 2026-08-16
+
+Three dependency-free repetitions modeled four logical task adapters with two
+simultaneous sessions each. Isolated routing could batch only within an adapter;
+the explicitly capable shared-backbone arm batched all eight requests together.
+
+| Arm | Backend calls | Mean wall time | Modeled memory |
+| --- | ---: | ---: | ---: |
+| Isolated model instances | 4 | 106.09 ms | 29,024 MB |
+| Shared backbone + adapters | 1 | 42.79 ms | 8,024 MB |
+
+Every arm completed all eight requests. The 72.35% memory reduction follows the
+declared 7,000 MB backbone and 256 MB-per-adapter model; it is not measured GPU
+memory. This result validates routing, batching, and accounting mechanics only,
+not real-model latency, policy quality, or closed-loop task success.
+
+Raw result: [`results/adapter_shared_backbone_20260816.json`](results/adapter_shared_backbone_20260816.json)
+
+SHA-256: `4daa00a01e981fb38d041fa11da8c14e6ce221837505a01267eeb659fb4fbbd5`
+
+Run it with:
+
+```bash
+actserve benchmark-adapters
+```
+
 ## Asynchronous action refill timing — 2026-08-16
 
 This dependency-free benchmark compares blocking chunk inference against

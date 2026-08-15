@@ -4,6 +4,7 @@ import argparse
 import sys
 
 from . import __version__
+from .adapter_benchmark import main as adapter_benchmark_main
 from .adapter_planner import main as adapter_planner_main
 from .async_benchmark import main as async_benchmark_main
 from .benchmark import main as benchmark_main
@@ -17,6 +18,8 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "benchmark":
         return benchmark_main(argv[1:])
+    if argv and argv[0] == "benchmark-adapters":
+        return adapter_benchmark_main(argv[1:])
     if argv and argv[0] == "benchmark-async":
         return async_benchmark_main(argv[1:])
     if argv and argv[0] == "benchmark-cuda":
@@ -36,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         nargs="?",
         help=(
             "available commands: benchmark, benchmark-async, benchmark-cuda, "
-            "benchmark-serial, plan-adapters, profile, tune-training"
+            "benchmark-adapters, benchmark-serial, plan-adapters, profile, tune-training"
         ),
     )
     args = parser.parse_args(argv)

@@ -1,0 +1,36 @@
+{
+  "schema": "actserve.adapter_benchmark.repetitions.v1",
+  "runs": [
+    {
+      "config": {"adapter_mb": 256, "adapters": 4, "backbone_mb": 7000, "fixed_ms": 20, "max_batch_size": 8, "per_item_ms": 2, "sessions_per_adapter": 2},
+      "isolated_models": {"backend_calls": 4, "completed": 8, "mean_batch_size": 2.0, "modeled_memory_mb": 29024, "wall_ms": 106.11154197249562},
+      "modeled_memory_reduction_percent": 72.35391400220507,
+      "schema": "actserve.adapter_benchmark.v1",
+      "scope": "synthetic routing and memory model; not real-model or task success",
+      "shared_backbone": {"backend_calls": 1, "completed": 8, "mean_batch_size": 8.0, "modeled_memory_mb": 8024, "wall_ms": 42.79412503819913}
+    },
+    {
+      "config": {"adapter_mb": 256, "adapters": 4, "backbone_mb": 7000, "fixed_ms": 20, "max_batch_size": 8, "per_item_ms": 2, "sessions_per_adapter": 2},
+      "isolated_models": {"backend_calls": 4, "completed": 8, "mean_batch_size": 2.0, "modeled_memory_mb": 29024, "wall_ms": 106.10541701316833},
+      "modeled_memory_reduction_percent": 72.35391400220507,
+      "schema": "actserve.adapter_benchmark.v1",
+      "scope": "synthetic routing and memory model; not real-model or task success",
+      "shared_backbone": {"backend_calls": 1, "completed": 8, "mean_batch_size": 8.0, "modeled_memory_mb": 8024, "wall_ms": 42.78141597751528}
+    },
+    {
+      "config": {"adapter_mb": 256, "adapters": 4, "backbone_mb": 7000, "fixed_ms": 20, "max_batch_size": 8, "per_item_ms": 2, "sessions_per_adapter": 2},
+      "isolated_models": {"backend_calls": 4, "completed": 8, "mean_batch_size": 2.0, "modeled_memory_mb": 29024, "wall_ms": 106.04208300355822},
+      "modeled_memory_reduction_percent": 72.35391400220507,
+      "schema": "actserve.adapter_benchmark.v1",
+      "scope": "synthetic routing and memory model; not real-model or task success",
+      "shared_backbone": {"backend_calls": 1, "completed": 8, "mean_batch_size": 8.0, "modeled_memory_mb": 8024, "wall_ms": 42.79387497808784}
+    }
+  ],
+  "summary": {
+    "isolated_calls": [4],
+    "shared_calls": [1],
+    "isolated_wall_ms_mean": 106.08634732974072,
+    "shared_wall_ms_mean": 42.78980533126742,
+    "memory_reduction_percent": [72.35391400220507]
+  }
+}
