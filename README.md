@@ -12,6 +12,10 @@ were safe successes.
 > to the serving profiler, asynchronous action queue, and public benchmark
 > harness. It does not send hardware commands or claim task superiority.
 
+Formal experiments must follow the explicit staged gate in
+[`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md); public benchmark
+success alone never authorizes attachment to an existing job.
+
 ## The pain it solves
 
 A FIFO model server can spend GPU time on frame 42 even after frame 43 has

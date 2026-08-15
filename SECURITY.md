@@ -7,6 +7,9 @@ safety system.
 Never connect model outputs directly to physical actuators without an
 independent, hardware-specific safety controller and authorized on-site owner.
 
+Before any private or formal-workflow evaluation, follow
+[`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md).
+
 Please report software vulnerabilities privately to the repository maintainer.
 Do not include credentials, private observations, model weights, or physical
 robot access details in a public issue.
