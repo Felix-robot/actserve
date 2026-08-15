@@ -18,3 +18,8 @@ success is measured.
 
 The bundled benchmark uses a public simulated latency model. It validates
 scheduler semantics and is not evidence of GPU or task-level superiority.
+
+`actserve benchmark-cuda` adds a real CUDA execution benchmark with a public
+synthetic ViT-style policy. It measures scheduler and batching behavior on real
+hardware, but it is still not a closed-loop task-success comparison against a
+production VLA/WAM runtime.

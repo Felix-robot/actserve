@@ -1,0 +1,76 @@
+{
+  "calibrated_p90_guarded_ms": {
+    "1": 1.99536414,
+    "2": 1.8866711600000001,
+    "3": 1.9138081600000003,
+    "4": 1.9961035600000003,
+    "5": 2.2049607800000004,
+    "6": 2.20203038,
+    "7": 2.15581498,
+    "8": 2.2888613000000007
+  },
+  "device": "NVIDIA A100-SXM4-80GB",
+  "model": {
+    "image_size": 224,
+    "layers": 6,
+    "width": 384
+  },
+  "results": [
+    {
+      "backend_calls": 320,
+      "backend_items": 320,
+      "batches": 320,
+      "cancelled": 0,
+      "case": "fifo_batch1",
+      "completed_on_time": 320,
+      "deadline_miss_rate": 0.0,
+      "deadline_missed": 0,
+      "dispatched": 320,
+      "e2e_p50_ms": 24.112513,
+      "e2e_p95_ms": 42.51081485,
+      "e2e_p99_ms": 45.25695822,
+      "expired": 0,
+      "failed": 0,
+      "mean_batch_size": 1.0,
+      "out_of_order": 0,
+      "queue_p50_ms": 21.5242755,
+      "queue_p95_ms": 39.92675465,
+      "replaced": 0,
+      "submitted": 320,
+      "useful_action_rate": 1.0,
+      "wall_seconds": 0.8768274886533618
+    },
+    {
+      "backend_calls": 40,
+      "backend_items": 320,
+      "batches": 40,
+      "cancelled": 0,
+      "case": "edf_coalescing_microbatch",
+      "completed_on_time": 320,
+      "deadline_miss_rate": 0.0,
+      "deadline_missed": 0,
+      "dispatched": 320,
+      "e2e_p50_ms": 10.654325,
+      "e2e_p95_ms": 17.53774655000001,
+      "e2e_p99_ms": 18.42364117,
+      "expired": 0,
+      "failed": 0,
+      "mean_batch_size": 8.0,
+      "out_of_order": 0,
+      "queue_p50_ms": 4.6315975,
+      "queue_p95_ms": 10.4740103,
+      "replaced": 0,
+      "submitted": 320,
+      "useful_action_rate": 1.0,
+      "wall_seconds": 0.6885319538414478
+    }
+  ],
+  "schema": "actserve.cuda_benchmark.v1",
+  "torch_version": "2.9.0+cu126",
+  "workload": {
+    "deadline_ms": 100.0,
+    "observation_hz": 30.0,
+    "observations_per_session": 20,
+    "sessions": 16
+  }
+}

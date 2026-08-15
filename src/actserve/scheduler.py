@@ -160,7 +160,7 @@ class Scheduler:
                             await asyncio.wait_for(
                                 self._condition.wait(), timeout=(dispatch_at - now) / 1_000_000_000
                             )
-                        except TimeoutError:
+                        except asyncio.TimeoutError:
                             pass
                         continue
                     batch = self._take_batch_locked()

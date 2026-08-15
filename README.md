@@ -8,8 +8,8 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.1 is an alpha scheduler and benchmark harness. It does not send hardware
-> commands and makes no unverified GPU-performance claim.
+> v0.2 is an alpha scheduler and public CUDA benchmark harness. It does not send
+> hardware commands or claim closed-loop task superiority.
 
 ## The pain it solves
 
@@ -27,7 +27,7 @@ closed-loop serving system needs:
 - latency-aware batch admission when the backend supplies an estimator;
 - explicit expired, replaced, missed, and failed outcomes;
 - privacy-safe scheduling traces;
-- backend-neutral integration.
+- backend-neutral integration;
 - fail-closed action identity validation across request, session, and sequence.
 
 ## Install
@@ -45,6 +45,23 @@ uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
 uv run pytest
 ```
+
+On a CUDA machine with PyTorch already installed, run the public synthetic
+vision-policy benchmark:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 actserve benchmark-cuda
+```
+
+This calibrates batch latency on the current GPU, then compares FIFO batch-1
+against ActServe using the same synthetic ViT-style policy and observation
+stream. It does not download model weights or use private task data.
+
+In a 32-session stress run at 60 Hz per session with a 30 ms deadline, FIFO
+produced 291/960 on-time actions while ActServe produced 960/960. ActServe also
+reduced p95 end-to-end latency from 31.43 ms to 16.42 ms. See
+[`benchmarks/README.md`](benchmarks/README.md) for both public runs, raw JSON,
+checksums, and the evidence boundary.
 
 Optional development HTTP server:
 
@@ -115,7 +132,7 @@ separate package. The default JSONL trace excludes observations and actions.
 
 ## Roadmap
 
-- Public PyTorch VLA adapter and real GPU benchmark.
+- Public real-model adapter and reproducible same-model comparison.
 - Session-aware vision-feature cache with explicit invalidation.
 - Multi-adapter routing and residency policy.
 - gRPC transport and Prometheus exporter.
