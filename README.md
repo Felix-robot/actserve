@@ -37,6 +37,7 @@ closed-loop serving system needs:
 - duplicate/out-of-order observation rejection;
 - compatible dynamic microbatching;
 - latency-aware batch admission when the backend supplies an estimator;
+- adaptive batch-size latency estimates for external HTTP policy services;
 - explicit expired, replaced, missed, and failed outcomes;
 - bounded pending queues with explicit retryable overload outcomes;
 - privacy-safe scheduling traces;

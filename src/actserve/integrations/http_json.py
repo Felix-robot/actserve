@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import statistics
+import time
+from collections import defaultdict, deque
 from collections.abc import Hashable, Mapping, Sequence
 from typing import Any
 
@@ -20,6 +23,9 @@ class HttpJsonBackend:
         *,
         max_batch_size: int = 8,
         timeout_ms: float = 30_000,
+        initial_latency_ms: float | None = None,
+        latency_window: int = 32,
+        latency_safety_factor: float = 1.10,
         headers: Mapping[str, str] | None = None,
         client: Any | None = None,
     ) -> None:
@@ -29,6 +35,12 @@ class HttpJsonBackend:
             raise ValueError("max_batch_size must be at least 1")
         if timeout_ms <= 0:
             raise ValueError("timeout_ms must be positive")
+        if initial_latency_ms is not None and initial_latency_ms < 0:
+            raise ValueError("initial_latency_ms must be non-negative")
+        if latency_window < 1:
+            raise ValueError("latency_window must be positive")
+        if latency_safety_factor < 1:
+            raise ValueError("latency_safety_factor must be at least 1")
         try:
             import httpx
         except ImportError as exc:  # pragma: no cover - optional dependency
@@ -37,6 +49,12 @@ class HttpJsonBackend:
         self.endpoint = endpoint
         self._max_batch_size = max_batch_size
         self.timeout_ms = timeout_ms
+        self.initial_latency_ms = initial_latency_ms
+        self.latency_safety_factor = latency_safety_factor
+        self._latency_window = latency_window
+        self._latencies_ms: dict[int, deque[float]] = defaultdict(
+            lambda: deque(maxlen=self._latency_window)
+        )
         self._owns_client = client is None
         self._client = client or httpx.AsyncClient(
             timeout=timeout_ms / 1000,
@@ -58,6 +76,29 @@ class HttpJsonBackend:
         input_signature = request.metadata.get("input_signature", "default")
         return self.endpoint, request.model, str(input_signature)
 
+    def estimate_batch_latency_ms(self, batch_size: int) -> float | None:
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
+        candidates = []
+        for observed_size, samples in self._latencies_ms.items():
+            if not samples:
+                continue
+            observed = (
+                samples[0]
+                if len(samples) == 1
+                else statistics.quantiles(samples, n=10, method="inclusive")[8]
+            )
+            scale = max(1.0, batch_size / observed_size)
+            candidates.append(observed * scale)
+        estimate = max(candidates) * self.latency_safety_factor if candidates else None
+        if self.initial_latency_ms is not None:
+            estimate = (
+                self.initial_latency_ms
+                if estimate is None
+                else max(estimate, self.initial_latency_ms)
+            )
+        return estimate
+
     async def infer_batch(
         self, requests: Sequence[InferenceRequest]
     ) -> Sequence[ActionChunk]:
@@ -70,6 +111,7 @@ class HttpJsonBackend:
                 f"batch has {len(requests)} requests, maximum is {self.max_batch_size}"
             )
 
+        started_ns = time.perf_counter_ns()
         response = await self._client.post(
             self.endpoint,
             json={"requests": [self._request_payload(request) for request in requests]},
@@ -83,7 +125,10 @@ class HttpJsonBackend:
             raise RuntimeError(
                 f"HTTP backend returned {len(actions)} actions for {len(requests)} requests"
             )
-        return [self._action_chunk(item) for item in actions]
+        chunks = [self._action_chunk(item) for item in actions]
+        elapsed_ms = (time.perf_counter_ns() - started_ns) / 1_000_000
+        self._latencies_ms[len(requests)].append(elapsed_ms)
+        return chunks
 
     async def aclose(self) -> None:
         if self._closed:

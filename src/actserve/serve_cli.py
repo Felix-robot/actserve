@@ -23,6 +23,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dispatch-guard-ms", type=float, default=1.0)
     parser.add_argument("--backend-timeout-ms", type=float, default=30_000)
     parser.add_argument(
+        "--initial-backend-latency-ms",
+        type=float,
+        help="conservative latency floor used before enough HTTP observations exist",
+    )
+    parser.add_argument("--latency-window", type=int, default=32)
+    parser.add_argument("--latency-safety-factor", type=float, default=1.10)
+    parser.add_argument(
+        "--drop-unserviceable-requests",
+        action="store_true",
+        help="reject requests whose learned latency estimate predicts a deadline miss",
+    )
+    parser.add_argument(
         "--max-pending-requests",
         type=int,
         default=1024,
@@ -55,6 +67,9 @@ def create_server_app(
         args.backend_url,
         max_batch_size=args.max_batch_size,
         timeout_ms=args.backend_timeout_ms,
+        initial_latency_ms=args.initial_backend_latency_ms,
+        latency_window=args.latency_window,
+        latency_safety_factor=args.latency_safety_factor,
         headers=headers,
     )
     scheduler = Scheduler(
@@ -64,6 +79,7 @@ def create_server_app(
             max_batch_wait_ms=args.max_batch_wait_ms,
             dispatch_guard_ms=args.dispatch_guard_ms,
             max_pending_requests=args.max_pending_requests,
+            drop_unserviceable_requests=args.drop_unserviceable_requests,
         ),
     )
     return create_app(scheduler, api_key=api_key)
@@ -85,6 +101,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("port must be in [1, 65535]")
     if args.max_pending_requests < 1:
         parser.error("max-pending-requests must be at least 1")
+    if args.latency_window < 1:
+        parser.error("latency-window must be at least 1")
+    if args.latency_safety_factor < 1:
+        parser.error("latency-safety-factor must be at least 1")
+    if args.initial_backend_latency_ms is not None and args.initial_backend_latency_ms < 0:
+        parser.error("initial-backend-latency-ms must be non-negative")
     try:
         app = create_server_app(args)
     except ValueError as exc:

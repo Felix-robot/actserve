@@ -95,3 +95,84 @@ async def test_http_backend_rejects_mismatched_identity() -> None:
 
     assert outcome.status is ResultStatus.FAILED
     assert "identity mismatch" in (outcome.error or "")
+
+
+async def test_http_backend_learns_conservative_batch_latency() -> None:
+    async def handle(request: httpx.Request) -> httpx.Response:
+        payload = __import__("json").loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "actions": [
+                    {
+                        "request_id": item["request_id"],
+                        "session_id": item["session_id"],
+                        "model": item["model"],
+                        "sequence_no": item["sequence_no"],
+                        "actions": [0.0],
+                    }
+                    for item in payload["requests"]
+                ]
+            },
+        )
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handle))
+    backend = HttpJsonBackend(
+        "http://policy.test/infer",
+        client=client,
+        latency_safety_factor=1.25,
+    )
+    assert backend.estimate_batch_latency_ms(1) is None
+    await backend.infer_batch([make_request(session="robot-a")])
+    batch_one = backend.estimate_batch_latency_ms(1)
+    batch_two = backend.estimate_batch_latency_ms(2)
+    await client.aclose()
+
+    assert batch_one is not None and batch_one > 0
+    assert batch_two is not None and batch_two >= batch_one * 2
+
+
+def test_http_backend_can_start_with_conservative_latency_floor() -> None:
+    backend = HttpJsonBackend(
+        "http://policy.test/infer",
+        client=object(),
+        initial_latency_ms=25,
+    )
+    assert backend.estimate_batch_latency_ms(1) == 25
+    assert backend.estimate_batch_latency_ms(8) == 25
+
+
+async def test_http_latency_floor_can_reject_unserviceable_request_before_network() -> None:
+    calls = 0
+
+    async def handle(_: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        raise AssertionError("unserviceable request reached HTTP backend")
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handle))
+    backend = HttpJsonBackend(
+        "http://policy.test/infer",
+        client=client,
+        initial_latency_ms=50,
+    )
+    async with Scheduler(
+        backend,
+        SchedulerConfig(
+            max_batch_wait_ms=0,
+            drop_unserviceable_requests=True,
+        ),
+    ) as scheduler:
+        outcome = await scheduler.submit(
+            InferenceRequest.with_timeout(
+                session_id="urgent",
+                model="public-policy",
+                observation={},
+                timeout_ms=5,
+                sequence_no=1,
+            )
+        )
+    await client.aclose()
+
+    assert outcome.status is ResultStatus.UNSERVICEABLE
+    assert calls == 0

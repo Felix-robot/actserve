@@ -110,3 +110,20 @@ Tune it with `--max-pending-requests`; when a new session would exceed the
 limit, ActServe returns HTTP `429` with `Retry-After: 1`. A newer observation
 may still replace an already queued observation from the same session, so
 backpressure does not prevent latest-frame coalescing.
+
+The HTTP backend learns a rolling p90 end-to-end latency independently for each
+observed batch size. Estimates include a configurable safety factor and use a
+conservative scaled estimate for unseen larger batches. To enable predictive
+deadline rejection from startup:
+
+```bash
+actserve serve \
+  --backend-url http://127.0.0.1:9000/infer \
+  --initial-backend-latency-ms 80 \
+  --latency-safety-factor 1.15 \
+  --drop-unserviceable-requests
+```
+
+The initial value should come from an isolated warmup on the same model and
+hardware. Predictive rejection is opt-in because a poor estimate can discard
+requests that might otherwise complete.
