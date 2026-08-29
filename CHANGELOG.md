@@ -10,6 +10,8 @@ All notable changes to ActServe are documented here. The project follows
 - Optional bounded scheduler queues with explicit `scheduler_overloaded`
   outcomes; the standalone HTTP server defaults to a 1024-request pending
   limit and returns retryable HTTP 429 responses when it is full.
+- Rolling p90 HTTP backend latency estimation by batch size, with configurable
+  warm-start floor and safety factor for deadline-aware admission.
 
 ## [0.8.0] - 2026-08-29
 
