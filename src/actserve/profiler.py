@@ -133,4 +133,3 @@ class StageProfiler:
             elapsed_ms=(time.perf_counter_ns() - self._started_ns) / 1_000_000,
             metrics=tuple(metrics),
         )
-

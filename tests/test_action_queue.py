@@ -86,4 +86,3 @@ async def test_close_wakes_waiters() -> None:
     await queue.close()
     with pytest.raises(ActionQueueClosed):
         await waiting
-
