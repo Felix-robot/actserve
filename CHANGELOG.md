@@ -12,6 +12,8 @@ All notable changes to ActServe are documented here. The project follows
   limit and returns retryable HTTP 429 responses when it is full.
 - Rolling p90 HTTP backend latency estimation by batch size, with configurable
   warm-start floor and safety factor for deadline-aware admission.
+- Reproducible real-model benchmark for pinned public LeRobot SmolVLA weights,
+  synthetic observations, explicit noise, and batched-action parity.
 
 ### Changed
 

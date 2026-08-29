@@ -100,6 +100,15 @@ reduced p95 end-to-end latency from 31.43 ms to 16.42 ms. See
 [`benchmarks/README.md`](benchmarks/README.md) for both public runs, raw JSON,
 checksums, and the evidence boundary.
 
+For a real public VLA rather than a synthetic policy,
+[`benchmarks/lerobot_smolvla.py`](benchmarks/lerobot_smolvla.py) runs pinned
+LeRobot SmolVLA weights with synthetic observations and explicit diffusion
+noise. On an Apple M5, counterbalanced 10-run measurements reduced mean wall
+time by 3.3% at two sessions and 12.0% at four sessions while preserving action
+chunks within the declared tolerance. This is serving evidence, not closed-loop
+task-success evidence; full raw results are published in
+[`benchmarks/README.md`](benchmarks/README.md).
+
 Optional development HTTP server:
 
 ```bash

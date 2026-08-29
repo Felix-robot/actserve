@@ -32,3 +32,14 @@ production VLA/WAM runtime.
 Pass `--batch-sizes 4,8,16` to calibrate once and compare several batch ceilings
 under an identical workload. The recommendation prioritizes useful on-time
 actions, then lower p95 latency, then fewer backend calls.
+
+`benchmarks/lerobot_smolvla.py` is the real public-model integration benchmark.
+It pins a SmolVLA revision, constructs deterministic synthetic observations,
+uses explicit per-request diffusion noise, warms both measured batch shapes,
+and counterbalances serial-first and ActServe-first trial order. Publish the raw
+paired samples and action parity rather than only the best summary number.
+
+The SmolVLA benchmark does not run a simulator or robot. Its result supports
+only serving compatibility and performance for the exact hardware, software,
+and workload recorded in the result. Select `max_batch_size` from a measurement
+on the intended backend; do not assume dynamic batching is universally faster.
