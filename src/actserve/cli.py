@@ -12,6 +12,7 @@ from .cuda_benchmark import main as cuda_benchmark_main
 from .profile_cli import main as profile_main
 from .serial_benchmark import main as serial_benchmark_main
 from .serve_cli import main as serve_main
+from .smolvla_serve_cli import main as smolvla_serve_main
 from .training_tuner import main as training_tuner_main
 
 
@@ -31,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
         return profile_main(argv[1:])
     if argv and argv[0] == "serve":
         return serve_main(argv[1:])
+    if argv and argv[0] == "serve-smolvla":
+        return smolvla_serve_main(argv[1:])
     if argv and argv[0] == "plan-adapters":
         return adapter_planner_main(argv[1:])
     if argv and argv[0] == "tune-training":
@@ -43,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
         help=(
             "available commands: benchmark, benchmark-async, benchmark-cuda, "
             "benchmark-adapters, benchmark-serial, plan-adapters, profile, serve, "
-            "tune-training"
+            "serve-smolvla, tune-training"
         ),
     )
     args = parser.parse_args(argv)
