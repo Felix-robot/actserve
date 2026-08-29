@@ -1,0 +1,112 @@
+{
+  "actserve_batched": {
+    "backend_calls": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "max_ms": 2205.956291873008,
+    "mean_ms": 1771.4410583488643,
+    "min_ms": 1578.797083813697,
+    "p50_ms": 1641.6605834383518,
+    "p95_ms": 2135.8561540953815,
+    "samples_ms": [
+      1602.2692918777466,
+      1578.797083813697,
+      1617.2435830812901,
+      1631.958374986425,
+      1651.3627918902785,
+      1598.098749993369,
+      1869.2097500897944,
+      1909.3364579603076,
+      2205.956291873008,
+      2050.178207922727
+    ]
+  },
+  "config": {
+    "batch_wait_ms": 10,
+    "deadline_ms": 120000,
+    "explicit_noise": true,
+    "measurement_order": [
+      "direct_then_actserve",
+      "actserve_then_direct",
+      "direct_then_actserve",
+      "actserve_then_direct",
+      "direct_then_actserve",
+      "actserve_then_direct",
+      "direct_then_actserve",
+      "actserve_then_direct",
+      "direct_then_actserve",
+      "actserve_then_direct"
+    ],
+    "repetitions": 10,
+    "seed": 20260829,
+    "sessions": 4,
+    "warmup": 1,
+    "warmup_batch_sizes": [1, 4]
+  },
+  "direct_serial": {
+    "backend_calls": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "max_ms": 2519.4668751209974,
+    "mean_ms": 2013.9462500810623,
+    "min_ms": 1758.326208917424,
+    "p50_ms": 1878.9252084679902,
+    "p95_ms": 2420.013912266586,
+    "samples_ms": [
+      1784.3722919933498,
+      1795.5600831191987,
+      1758.326208917424,
+      1807.402249891311,
+      1772.1873328555375,
+      1950.4481670446694,
+      2298.460291000083,
+      2165.3005839325488,
+      2519.4668751209974,
+      2287.9384169355035
+    ]
+  },
+  "environment": {
+    "accelerator_memory_snapshot": {
+      "current_allocated_mb": 864.6474609375,
+      "driver_allocated_mb": 1812.015625
+    },
+    "actserve": "0.8.0",
+    "device": "mps",
+    "device_name": "Apple Metal Performance Shaders",
+    "hardware_label": "Apple M5, 16 GB unified memory",
+    "lerobot": "0.6.1",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "torch": "2.11.0"
+  },
+  "generated_at_utc": "2026-08-29T09:48:59.270122+00:00",
+  "load_seconds": 14.906298582907766,
+  "measurement": "steady state after batch-1 and full-batch shape warmup",
+  "model": {
+    "id": "lerobot/smolvla_base",
+    "revision": "c83c3163b8ca9b7e67c509fffd9121e66cb96205"
+  },
+  "paired_speedup": {
+    "max": 1.2296427893604065,
+    "mean": 1.136113054778145,
+    "median": 1.1250148562482187,
+    "min": 1.0731665637367025,
+    "samples": [
+      1.1136531799234517,
+      1.1372963007898995,
+      1.087236472793624,
+      1.1075051163031933,
+      1.0731665637367025,
+      1.2204803783575717,
+      1.2296427893604065,
+      1.1340592041308846,
+      1.1421200340201652,
+      1.115970508365553
+    ]
+  },
+  "parity": {
+    "atol": 0.01,
+    "max_abs": 0.005064249038696289,
+    "passed": true,
+    "rmse_max": 0.0014333953149616718
+  },
+  "schema": "actserve.lerobot_smolvla_benchmark.v1",
+  "scope": "real public model with synthetic observations; not closed-loop task success",
+  "speedup_mean": 1.1368971271097406
+}

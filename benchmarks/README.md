@@ -1,5 +1,58 @@
 # Public benchmark results
 
+## LeRobot SmolVLA real-model benchmark
+
+`benchmarks/lerobot_smolvla.py` compares serial batch-1 inference with ActServe
+dynamic batching on Hugging Face's public 450M SmolVLA checkpoint. It uses
+synthetic camera/state observations, a pinned model revision, fixed random seed,
+and explicit per-request diffusion noise so returned action chunks can be
+checked for parity. The steady-state measurement warms both batch-1 and full
+batch shapes first, avoiding accelerator graph-compilation time being silently
+charged to only one side of the comparison; model load time remains separate.
+
+Run it in an isolated environment:
+
+```bash
+uv venv --python 3.12 /tmp/actserve-smolvla/venv
+uv pip install --python /tmp/actserve-smolvla/venv/bin/python \
+  'lerobot[smolvla]' 'actserve @ git+https://github.com/Felix-robot/actserve.git'
+HF_HUB_DOWNLOAD_TIMEOUT=300 /tmp/actserve-smolvla/venv/bin/python \
+  benchmarks/lerobot_smolvla.py --device mps --sessions 2 --repetitions 10 \
+  --hardware-label 'Apple M5, 16 GB unified memory' \
+  --output /tmp/smolvla-result.json
+```
+
+Use `--device cuda` on NVIDIA hardware. This is real-model serving evidence,
+but synthetic observations do not measure policy quality or closed-loop task
+success. Results must identify the model revision, LeRobot/Torch versions,
+hardware, seed, batching configuration, backend calls, and action parity.
+
+### Published Apple M5 results — 2026-08-29
+
+Both runs used SmolVLA weights and processors from revision
+`c83c3163b8ca9b7e67c509fffd9121e66cb96205`, LeRobot 0.6.1, Torch 2.11.0,
+MPS, ten repetitions, and counterbalanced measurement order. Every paired trial
+was faster with ActServe batching and all returned action chunks passed the
+declared numerical tolerance.
+
+| Sessions | Serial mean | ActServe mean | Mean wall speedup | Calls per trial | Max action delta |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 890.03 ms | 860.80 ms | 1.034x | 2 -> 1 | 0.00878 |
+| 4 | 2013.95 ms | 1771.44 ms | 1.137x | 4 -> 1 | 0.00506 |
+
+Raw results and SHA-256:
+
+- [`results/apple_m5_smolvla_base_batch2_20260829.json`](results/apple_m5_smolvla_base_batch2_20260829.json):
+  `d185fdd7aab45f6d0dcb9bacf816c043ed37199f746447d6bbb6c764edf53be6`
+- [`results/apple_m5_smolvla_base_batch4_20260829.json`](results/apple_m5_smolvla_base_batch4_20260829.json):
+  `efb71769c1a071223da7741c94b21c86191eb31505a3d425c4519822df1682e9`
+
+These measurements establish a public-policy integration and a modest
+steady-state MPS serving gain for this exact workload. They do not establish a
+universal batching gain, CUDA performance, robot safety, policy quality, or
+closed-loop task success. Run the benchmark on the intended backend before
+choosing `max_batch_size`.
+
 ## Shared-backbone adapter routing — 2026-08-16
 
 Three dependency-free repetitions modeled four logical task adapters with two
