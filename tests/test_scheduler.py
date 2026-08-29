@@ -117,9 +117,9 @@ async def test_missed_actions_are_dropped() -> None:
 
 async def test_latency_estimator_prevents_harmful_batch() -> None:
     backend = SimulatedBackend(fixed_ms=10, per_item_ms=10, max_batch_size=2)
-    config = SchedulerConfig(max_batch_wait_ms=10, dispatch_guard_ms=0)
+    config = SchedulerConfig(max_batch_wait_ms=10, dispatch_guard_ms=5)
     async with Scheduler(backend, config) as scheduler:
-        urgent = request("urgent", 0, timeout_ms=35)
+        urgent = request("urgent", 0, timeout_ms=40)
         relaxed = request("relaxed", 0, timeout_ms=100)
         outcomes = await asyncio.gather(
             scheduler.submit(urgent),
@@ -172,3 +172,29 @@ async def test_backend_identity_mismatch_fails_closed() -> None:
         outcome = await scheduler.submit(request("robot", 0))
     assert outcome.status is ResultStatus.FAILED
     assert "identity mismatch" in (outcome.error or "")
+
+
+async def test_pending_capacity_rejects_new_session_but_allows_replacement() -> None:
+    backend = BlockingBackend()
+    config = SchedulerConfig(max_batch_wait_ms=0, max_pending_requests=1)
+    async with Scheduler(backend, config) as scheduler:
+        blocker = asyncio.create_task(scheduler.submit(request("blocker", 0)))
+        await backend.started.wait()
+
+        old = await scheduler.enqueue(request("queued", 1))
+        replacement = await scheduler.enqueue(request("queued", 2))
+        assert (await old).status is ResultStatus.REPLACED
+
+        retry_request = request("retry", 1)
+        overloaded = await scheduler.submit(retry_request)
+        assert overloaded.status is ResultStatus.OVERLOADED
+        assert overloaded.dispatched_ns is None
+
+        backend.release.set()
+        first, latest = await asyncio.gather(blocker, replacement)
+        retried = await scheduler.submit(retry_request)
+
+    assert first.status is ResultStatus.COMPLETED
+    assert latest.status is ResultStatus.COMPLETED
+    assert retried.status is ResultStatus.COMPLETED
+    assert scheduler.metrics.snapshot().overloaded == 1

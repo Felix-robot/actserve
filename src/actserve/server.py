@@ -6,7 +6,7 @@ from typing import Any
 from . import __version__
 from .metrics import prometheus_text
 from .scheduler import Scheduler
-from .types import InferenceRequest
+from .types import InferenceRequest, ResultStatus
 
 
 def create_app(scheduler: Scheduler, *, api_key: str | None = None):
@@ -99,6 +99,12 @@ def create_app(scheduler: Scheduler, *, api_key: str | None = None):
             metadata=payload.metadata,
         )
         outcome = await scheduler.submit(request)
+        if outcome.status is ResultStatus.OVERLOADED:
+            raise HTTPException(
+                status_code=429,
+                detail=outcome.error,
+                headers={"Retry-After": "1"},
+            )
         if outcome.error:
             raise HTTPException(status_code=503, detail=outcome.error)
         return {

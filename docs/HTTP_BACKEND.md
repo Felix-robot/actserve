@@ -104,3 +104,9 @@ actserve serve \
 The service exposes unauthenticated `/healthz` and `/readyz` probes. When an API
 key is configured, `/v1/actions`, `/v1/metrics`, and `/metrics` require a Bearer
 token. Binding to a non-loopback interface remains an explicit operator choice.
+
+The standalone command bounds the pending queue at 1024 requests by default.
+Tune it with `--max-pending-requests`; when a new session would exceed the
+limit, ActServe returns HTTP `429` with `Retry-After: 1`. A newer observation
+may still replace an already queued observation from the same session, so
+backpressure does not prevent latest-frame coalescing.

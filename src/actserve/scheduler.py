@@ -23,12 +23,15 @@ class SchedulerConfig:
     enforce_monotonic_sequence: bool = True
     drop_missed_actions: bool = True
     drop_unserviceable_requests: bool = False
+    max_pending_requests: int | None = None
 
     def __post_init__(self) -> None:
         if self.max_batch_wait_ms < 0 or self.dispatch_guard_ms < 0:
             raise ValueError("scheduler timings must be non-negative")
         if self.max_batch_size is not None and self.max_batch_size < 1:
             raise ValueError("max_batch_size must be at least 1")
+        if self.max_pending_requests is not None and self.max_pending_requests < 1:
+            raise ValueError("max_pending_requests must be at least 1")
 
 
 @dataclass(order=True, slots=True)
@@ -111,10 +114,30 @@ class Scheduler:
                 envelope.active = False
                 self._finish(envelope, ResultStatus.OUT_OF_ORDER)
                 return future
+            previous = None
+            if self.config.coalesce_sessions:
+                candidate = self._pending_by_session.get(session_key)
+                if candidate is not None and candidate.active and candidate.dispatched_ns is None:
+                    previous = candidate
+
+            self._remove_inactive_locked()
+            self._expire_requests_locked()
+            at_capacity = (
+                self.config.max_pending_requests is not None
+                and len(self._heap) >= self.config.max_pending_requests
+            )
+            if previous is None and at_capacity:
+                envelope.active = False
+                self._finish(
+                    envelope,
+                    ResultStatus.OVERLOADED,
+                    error="scheduler pending-request capacity is exhausted",
+                )
+                return future
+
             self._latest_sequence_by_session[session_key] = request.sequence_no
             if self.config.coalesce_sessions:
-                previous = self._pending_by_session.get(session_key)
-                if previous is not None and previous.active and previous.dispatched_ns is None:
+                if previous is not None:
                     previous.active = False
                     self._finish(
                         previous,
