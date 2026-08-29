@@ -28,7 +28,8 @@ Repository = "https://github.com/Felix-robot/actserve"
 Issues = "https://github.com/Felix-robot/actserve/issues"
 
 [project.optional-dependencies]
-server = ["fastapi>=0.115", "uvicorn>=0.30"]
+server = ["fastapi>=0.115", "httpx>=0.28", "uvicorn>=0.30"]
+http = ["httpx>=0.28"]
 embodied-cpp = ["pyzmq>=26.0"]
 dev = [
   "fastapi>=0.115",

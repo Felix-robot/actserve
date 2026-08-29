@@ -46,6 +46,9 @@ uv sync --extra dev
 ```
 
 The scheduler core has no runtime dependencies. Python 3.10+ is supported.
+Install from the repository with `pip install "actserve[server] @
+git+https://github.com/Felix-robot/actserve.git"` until a PyPI release is
+published.
 
 ## Try it
 
@@ -190,6 +193,10 @@ workload validation.
 For task adapters that share one loaded backbone, see
 [`docs/ADAPTER_ROUTING.md`](docs/ADAPTER_ROUTING.md). Mixed-adapter batching is
 opt-in and remains partitioned by backbone and input signature.
+
+To put ActServe in front of an existing JSON policy service without sharing its
+Python environment, use [`HttpJsonBackend`](docs/HTTP_BACKEND.md). It supports
+dynamic batches while preserving request, session, model, and sequence identity.
 
 ## Roadmap
 

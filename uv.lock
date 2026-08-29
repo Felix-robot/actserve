@@ -19,8 +19,12 @@ dev = [
 embodied-cpp = [
     { name = "pyzmq" },
 ]
+http = [
+    { name = "httpx" },
+]
 server = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "uvicorn" },
 ]
 
@@ -29,6 +33,8 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'dev'", specifier = ">=0.115" },
     { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.115" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28" },
+    { name = "httpx", marker = "extra == 'http'", specifier = ">=0.28" },
+    { name = "httpx", marker = "extra == 'server'", specifier = ">=0.28" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.24" },
     { name = "pyzmq", marker = "extra == 'embodied-cpp'", specifier = ">=26.0" },
@@ -36,7 +42,7 @@ requires-dist = [
     { name = "uvicorn", marker = "extra == 'dev'", specifier = ">=0.30" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.30" },
 ]
-provides-extras = ["server", "embodied-cpp", "dev"]
+provides-extras = ["server", "http", "embodied-cpp", "dev"]
 
 [[package]]
 name = "annotated-doc"
