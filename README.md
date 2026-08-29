@@ -37,6 +37,7 @@ closed-loop serving system needs:
 - compatible dynamic microbatching;
 - latency-aware batch admission when the backend supplies an estimator;
 - adaptive batch-size latency estimates for external HTTP policy services;
+- first-class non-blocking LeRobot SmolVLA backend and serving command;
 - explicit expired, replaced, missed, and failed outcomes;
 - bounded pending queues with explicit retryable overload outcomes;
 - privacy-safe scheduling traces;
@@ -63,6 +64,7 @@ uv run actserve benchmark --sessions 8 --observations 20
 uv run actserve benchmark-adapters
 uv run actserve benchmark-async
 uv run actserve benchmark-serial
+uv run actserve serve-smolvla --help
 uv run actserve plan-adapters examples/adapter_demand.json --budget-mb 512
 uv run actserve profile --gpu 0 -- python your_workload.py
 uv run actserve tune-training examples/training_trials.json
@@ -127,6 +129,13 @@ uv run actserve serve --backend-url http://127.0.0.1:9000/infer
 The standalone server binds to `127.0.0.1` by default and supports front-end
 and backend Bearer tokens supplied by environment-variable name. See
 [`docs/HTTP_BACKEND.md`](docs/HTTP_BACKEND.md).
+
+To load the tested public LeRobot SmolVLA policy directly, install
+`lerobot[smolvla]` and run `actserve serve-smolvla --device cuda`. Inference
+runs on a dedicated worker so it does not block scheduler and HTTP admission;
+the backend validates configured input shapes and preserves action identity.
+See [`docs/SMOLVLA.md`](docs/SMOLVLA.md) for the request contract, in-process
+API, MPS/CUDA selection, and safety boundary.
 
 Minimal integration:
 
@@ -224,7 +233,6 @@ dynamic batches while preserving request, session, model, and sequence identity.
 
 ## Roadmap
 
-- Adaptive latency estimation and backpressure for HTTP policy backends.
 - Session-aware vision-feature cache with explicit invalidation and parity tests.
 - Public simulator benchmark with pinned model weights, seeds, and task-quality gates.
 - gRPC transport for high-throughput binary observations.

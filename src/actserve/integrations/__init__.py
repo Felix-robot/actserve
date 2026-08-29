@@ -2,5 +2,6 @@
 
 from .embodied_cpp import EmbodiedCppVlaBackend
 from .http_json import HttpJsonBackend
+from .smolvla import SmolVLABackend
 
-__all__ = ["EmbodiedCppVlaBackend", "HttpJsonBackend"]
+__all__ = ["EmbodiedCppVlaBackend", "HttpJsonBackend", "SmolVLABackend"]

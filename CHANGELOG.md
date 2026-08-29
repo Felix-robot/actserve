@@ -5,6 +5,12 @@ All notable changes to ActServe are documented here. The project follows
 
 ## [Unreleased]
 
+### Added
+
+- First-class in-process LeRobot SmolVLA backend with dedicated non-blocking
+  inference worker, exact input-shape validation, adaptive batch latency
+  estimates, identity-preserving action chunks, and `actserve serve-smolvla`.
+
 ## [0.9.0] - 2026-08-29
 
 ### Added

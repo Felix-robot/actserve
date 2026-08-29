@@ -11,6 +11,7 @@ from .action_queue import (
 from .adapter_backend import AdapterBackend, AdapterRoute, RoutedRequest
 from .adapter_planner import AdapterDemand, AdapterResidencyPlan, plan_adapter_residency
 from .backend import InferenceBackend
+from .integrations.smolvla import SmolVLABackend
 from .metrics import MetricsSnapshot, SchedulerMetrics
 from .profiler import ProfileMetric, ProfileSnapshot, StageProfiler
 from .scheduler import Scheduler, SchedulerConfig
@@ -41,6 +42,7 @@ __all__ = [
     "Scheduler",
     "SchedulerConfig",
     "SchedulerMetrics",
+    "SmolVLABackend",
     "StageProfiler",
     "TrainingPhaseMetric",
     "TrainingProfiler",
