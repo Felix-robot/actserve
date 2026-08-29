@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -18,3 +18,14 @@ jobs:
       - run: uv sync --extra dev
       - run: uv run ruff check .
       - run: uv run pytest
+      - run: uv build
+      - name: Install wheel and smoke-test CLI
+        run: |
+          package_version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+          uv venv --python ${{ matrix.python-version }} .venv-wheel
+          uv pip install --python .venv-wheel/bin/python --find-links dist "actserve[server]==${package_version}"
+          test "$(.venv-wheel/bin/actserve --version)" = "${package_version}"
+          .venv-wheel/bin/actserve benchmark-async \
+            --chunks 1 --chunk-size 2 --inference-ms 1 --tick-ms 1 --low-watermark 1 \
+            | .venv-wheel/bin/python -c \
+              'import json, sys; result = json.load(sys.stdin); assert result["asynchronous"]["actions_executed"] == 2'

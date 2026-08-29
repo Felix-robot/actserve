@@ -19,6 +19,11 @@ success is measured.
 The bundled benchmark uses a public simulated latency model. It validates
 scheduler semantics and is not evidence of GPU or task-level superiority.
 
+`actserve benchmark-serial` models a single-request runtime such as the current
+Embodied.cpp VLA server. It isolates the benefit of stale-frame coalescing and
+predicted-deadline-miss admission control, but does not execute Embodied.cpp or
+support a real-model performance claim.
+
 `actserve benchmark-cuda` adds a real CUDA execution benchmark with a public
 synthetic ViT-style policy. It measures scheduler and batching behavior on real
 hardware, but it is still not a closed-loop task-success comparison against a

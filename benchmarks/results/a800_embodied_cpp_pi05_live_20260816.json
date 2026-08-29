@@ -1,0 +1,97 @@
+{
+  "actserve": {
+    "core_commit": "bfa60bb",
+    "version": "0.4.0"
+  },
+  "embodied_cpp": {
+    "commit": "c5a96a2f2442c3a459be87f74f60703949d4eb00",
+    "model": "SEU-PAISys/Embodied.cpp pi05_libero_finetuned_v044",
+    "model_sha256": "caee27a696914aeec6e3ca81f4ebac64ea057dc0ac3438ca533ff44fd133e1b8",
+    "mmproj_sha256": "494353054dcd180a40d14d32d923b0fe7024f0f30a2d530a2b062afb40668700",
+    "timing_detail": "phase"
+  },
+  "environment": {
+    "cuda": "12.2",
+    "gpu": "NVIDIA A800-SXM4-80GB",
+    "gpu_index": 2,
+    "gpu_memory_free_after_model_mib": 18058,
+    "gpu_memory_free_after_runs_mib": 17678,
+    "gpu_memory_free_before_model_mib": 25081,
+    "note": "GPU was shared with pre-existing processes; neither arm changed or inspected those workloads"
+  },
+  "runs": [
+    {
+      "actserve": {
+        "dispatched": 5,
+        "latest_frame_on_time": 4,
+        "max_action_delta": 0.048428356647491455,
+        "on_time": 5,
+        "parity_failures": 0,
+        "parity_tolerance": 0.0887238085269928,
+        "replaced": 11
+      },
+      "deadline_ms": 522.552156,
+      "direct_fifo": {
+        "dispatched": 16,
+        "latest_frame_on_time": 0,
+        "on_time": 5,
+        "p50_request_ms": 96.1658025,
+        "p95_request_ms": 126.98347
+      },
+      "direct_repeat_max_action_delta": 0.059149205684661865,
+      "warmup_ms": [89.386232, 87.092026, 86.710989, 79.132048, 133.575588]
+    },
+    {
+      "actserve": {
+        "dispatched": 5,
+        "latest_frame_on_time": 4,
+        "max_action_delta": 0.040911875665187836,
+        "on_time": 5,
+        "parity_failures": 0,
+        "parity_tolerance": 0.07598751783370972,
+        "replaced": 11
+      },
+      "deadline_ms": 554.930016,
+      "direct_fifo": {
+        "dispatched": 16,
+        "latest_frame_on_time": 0,
+        "on_time": 7,
+        "p50_request_ms": 76.5934645,
+        "p95_request_ms": 94.07959
+      },
+      "direct_repeat_max_action_delta": 0.050658345222473145,
+      "warmup_ms": [91.08255, 93.172198, 92.488336, 90.184422, 152.84152]
+    },
+    {
+      "actserve": {
+        "dispatched": 5,
+        "latest_frame_on_time": 4,
+        "max_action_delta": 0.05577576160430908,
+        "on_time": 5,
+        "parity_failures": 0,
+        "parity_tolerance": 0.07783379964530468,
+        "replaced": 11
+      },
+      "deadline_ms": 486.38713199999995,
+      "direct_fifo": {
+        "dispatched": 16,
+        "latest_frame_on_time": 0,
+        "on_time": 6,
+        "p50_request_ms": 77.48097250000001,
+        "p95_request_ms": 89.516411
+      },
+      "direct_repeat_max_action_delta": 0.05188919976353645,
+      "warmup_ms": [84.941055, 73.846969, 78.219925, 81.064522, 91.638465]
+    }
+  ],
+  "scope": "synthetic serving freshness with a real public model; not closed-loop task success",
+  "trace": {
+    "action_noise": "fixed zeros",
+    "arrival_ms": 5.0,
+    "frames_per_session": 4,
+    "image": "224x224 RGB float32 zeros",
+    "sessions": 4,
+    "state": "32 float32 zeros",
+    "tokens": [1]
+  }
+}

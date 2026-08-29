@@ -1,0 +1,25 @@
+{
+  "trials": [
+    {
+      "config": {"microbatch": 2, "num_workers": 4, "precision": "bf16"},
+      "samples_per_second": 18.5,
+      "p95_step_ms": 221.0,
+      "memory_headroom_mb": 4096,
+      "status": "ok"
+    },
+    {
+      "config": {"microbatch": 4, "num_workers": 8, "precision": "bf16"},
+      "samples_per_second": 26.2,
+      "p95_step_ms": 310.0,
+      "memory_headroom_mb": 1800,
+      "status": "ok"
+    },
+    {
+      "config": {"microbatch": 8, "num_workers": 8, "precision": "bf16"},
+      "samples_per_second": 0.0,
+      "p95_step_ms": 0.0,
+      "memory_headroom_mb": 0.0,
+      "status": "oom"
+    }
+  ]
+}

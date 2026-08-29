@@ -28,6 +28,7 @@ class MetricsSnapshot:
     completed_on_time: int
     deadline_missed: int
     expired: int
+    unserviceable: int
     replaced: int
     out_of_order: int
     failed: int
@@ -60,6 +61,7 @@ class MetricsSnapshot:
             "completed_on_time": self.completed_on_time,
             "deadline_missed": self.deadline_missed,
             "expired": self.expired,
+            "unserviceable": self.unserviceable,
             "replaced": self.replaced,
             "out_of_order": self.out_of_order,
             "failed": self.failed,
@@ -115,6 +117,7 @@ class SchedulerMetrics:
             completed_on_time=self._status[ResultStatus.COMPLETED],
             deadline_missed=self._status[ResultStatus.DEADLINE_MISSED],
             expired=self._status[ResultStatus.EXPIRED],
+            unserviceable=self._status[ResultStatus.UNSERVICEABLE],
             replaced=self._status[ResultStatus.REPLACED],
             out_of_order=self._status[ResultStatus.OUT_OF_ORDER],
             failed=self._status[ResultStatus.FAILED],
@@ -139,6 +142,7 @@ def prometheus_text(snapshot: MetricsSnapshot) -> str:
         "completed_on_time",
         "deadline_missed",
         "expired",
+        "unserviceable",
         "replaced",
         "out_of_order",
         "failed",

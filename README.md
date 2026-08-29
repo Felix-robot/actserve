@@ -1,5 +1,9 @@
 # ActServe
 
+[![CI](https://github.com/Felix-robot/actserve/actions/workflows/ci.yml/badge.svg)](https://github.com/Felix-robot/actserve/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10--3.13-blue.svg)](pyproject.toml)
+
 Deadline-aware inference serving for embodied AI agents.
 
 ActServe treats robot inference as a stream of perishable observations,
@@ -8,8 +12,14 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.3 is an alpha scheduler and public CUDA benchmark harness. It does not send
-> hardware commands or claim closed-loop task superiority.
+> v0.8 adds a generic JSON/HTTP policy backend and standalone authenticated
+> serving command to shared-backbone adapter routing, privacy-safe profiling,
+> asynchronous action queues, and public benchmark tools. It does not send
+> hardware commands or claim task superiority.
+
+Formal experiments must follow the explicit staged gate in
+[`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md); public benchmark
+success alone never authorizes attachment to an existing job.
 
 ## The pain it solves
 
@@ -19,6 +29,8 @@ and long-tail latency. ActServe adds the control-plane semantics that a
 closed-loop serving system needs:
 
 - persistent robot sessions;
+- asynchronous action queues with explicit low-watermark refill;
+- explicit shared-backbone and multi-adapter routing;
 - monotonic per-observation deadlines;
 - earliest-deadline-first scheduling;
 - pending-frame coalescing per session;
@@ -27,6 +39,7 @@ closed-loop serving system needs:
 - latency-aware batch admission when the backend supplies an estimator;
 - explicit expired, replaced, missed, and failed outcomes;
 - privacy-safe scheduling traces;
+- privacy-safe training phase and bottleneck profiling;
 - backend-neutral integration;
 - fail-closed action identity validation across request, session, and sequence.
 
@@ -36,15 +49,33 @@ closed-loop serving system needs:
 uv sync --extra dev
 ```
 
-The scheduler core has no runtime dependencies. Python 3.10+ is supported.
+The scheduler core has no runtime dependencies. Python 3.10–3.13 is tested.
+Install from the repository with `pip install "actserve[server] @
+git+https://github.com/Felix-robot/actserve.git"` until a PyPI release is
+published.
 
 ## Try it
 
 ```bash
 uv run python examples/basic.py
 uv run actserve benchmark --sessions 8 --observations 20
+uv run actserve benchmark-adapters
+uv run actserve benchmark-async
+uv run actserve benchmark-serial
+uv run actserve plan-adapters examples/adapter_demand.json --budget-mb 512
+uv run actserve profile --gpu 0 -- python your_workload.py
+uv run actserve tune-training examples/training_trials.json
 uv run pytest
 ```
+
+`actserve profile` records process wall time plus optional GPU utilization,
+memory, and power samples. Command arguments are redacted unless
+`--include-command` is explicitly supplied, and model inputs/outputs are never
+captured.
+
+`actserve benchmark-async` uses a public synthetic timing loop to compare
+blocking chunk inference with low-watermark asynchronous refill. It demonstrates
+control-loop overlap only; it does not claim simulator or robot task success.
 
 On a CUDA machine with PyTorch already installed, run the public synthetic
 vision-policy benchmark:
@@ -76,6 +107,16 @@ uv run uvicorn examples.server:app
 
 It exposes `POST /v1/actions`, JSON metrics at `/v1/metrics`, and Prometheus
 exposition at `/metrics`.
+
+For a real external JSON policy endpoint, no application glue is required:
+
+```bash
+uv run actserve serve --backend-url http://127.0.0.1:9000/infer
+```
+
+The standalone server binds to `127.0.0.1` by default and supports front-end
+and backend Bearer tokens supplied by environment-variable name. See
+[`docs/HTTP_BACKEND.md`](docs/HTTP_BACKEND.md).
 
 Minimal integration:
 
@@ -134,17 +175,55 @@ The backend API is intentionally narrow. Proprietary models, camera data,
 prompts, action conventions, checkpoints, and experiment traces can live in a
 separate package. The default JSONL trace excludes observations and actions.
 
+## Embodied.cpp integration
+
+ActServe can sit in front of Embodied.cpp's serial ZeroMQ/Protobuf VLA server.
+Embodied.cpp keeps responsibility for portable C++ model execution; ActServe
+adds session coalescing, EDF ordering, admission control, response identity
+validation, and adaptive end-to-end latency estimation.
+
+Install the optional transport and follow the public integration guide:
+
+```bash
+uv sync --extra embodied-cpp
+uv run actserve benchmark-serial
+```
+
+See [`docs/EMBODIED_CPP.md`](docs/EMBODIED_CPP.md). The serial benchmark is a
+scheduler-only simulation and is not evidence of real-model speed or task
+success. The guide also includes a live public-checkpoint benchmark that
+measures latest-frame deadline success against the same unmodified server.
+
+For decoupled action-chunk inference and execution, see
+[`docs/ASYNC_ACTIONS.md`](docs/ASYNC_ACTIONS.md). The queue fails closed on
+underrun and leaves robot-specific fallback commands outside the generic
+runtime.
+
+For dependency-free data-wait, compute, optimizer, and checkpoint timing, see
+[`docs/TRAINING_PROFILER.md`](docs/TRAINING_PROFILER.md). It stores numeric
+timings only and reports optimization hypotheses that still require isolated
+workload validation.
+
+For task adapters that share one loaded backbone, see
+[`docs/ADAPTER_ROUTING.md`](docs/ADAPTER_ROUTING.md). Mixed-adapter batching is
+opt-in and remains partitioned by backbone and input signature.
+
+To put ActServe in front of an existing JSON policy service without sharing its
+Python environment, use [`HttpJsonBackend`](docs/HTTP_BACKEND.md). It supports
+dynamic batches while preserving request, session, model, and sequence identity.
+
 ## Roadmap
 
-- Public real-model adapter and reproducible same-model comparison.
-- Session-aware vision-feature cache with explicit invalidation.
-- Multi-adapter routing and residency policy.
-- gRPC transport and Prometheus exporter.
-- Backend adapter for a portable C++ embodied runtime.
+- Adaptive latency estimation and backpressure for HTTP policy backends.
+- Session-aware vision-feature cache with explicit invalidation and parity tests.
+- Public simulator benchmark with pinned model weights, seeds, and task-quality gates.
+- gRPC transport for high-throughput binary observations.
 
 See [`docs/POSITIONING.md`](docs/POSITIONING.md) for the deliberately narrow
 comparison boundary and [`SECURITY.md`](SECURITY.md) before any physical-robot
 integration.
+
+Release history is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 

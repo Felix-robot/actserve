@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a reproducible ActServe failure or incorrect outcome.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not include credentials, private observations, actions, model
+        weights, unpublished task details, or physical robot access data.
+  - type: input
+    id: version
+    attributes:
+      label: ActServe version or commit
+      placeholder: v0.8.0 or git SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Scheduler
+        - Action queue
+        - HTTP server or backend
+        - Embodied.cpp integration
+        - Training profiler or tuner
+        - Benchmark
+        - Documentation or packaging
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal public reproduction
+      description: Include commands, configuration, and synthetic inputs only.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, runtime, accelerator, and relevant package versions.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, private data, model weights, and robot access details.
+          required: true
