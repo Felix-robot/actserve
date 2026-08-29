@@ -104,6 +104,16 @@ uv run uvicorn examples.server:app
 It exposes `POST /v1/actions`, JSON metrics at `/v1/metrics`, and Prometheus
 exposition at `/metrics`.
 
+For a real external JSON policy endpoint, no application glue is required:
+
+```bash
+uv run actserve serve --backend-url http://127.0.0.1:9000/infer
+```
+
+The standalone server binds to `127.0.0.1` by default and supports front-end
+and backend Bearer tokens supplied by environment-variable name. See
+[`docs/HTTP_BACKEND.md`](docs/HTTP_BACKEND.md).
+
 Minimal integration:
 
 ```python

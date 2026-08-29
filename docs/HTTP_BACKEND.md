@@ -60,3 +60,47 @@ backend = HttpJsonBackend(
 Requests are batched only when endpoint, logical model, and optional
 `metadata.input_signature` match. Use TLS and authentication for any non-local
 backend; never place tokens directly in committed source or shell history.
+
+## Run as a standalone control plane
+
+The server command starts ActServe in front of the policy endpoint and listens
+on localhost by default:
+
+```bash
+pip install "actserve[server]"
+actserve serve --backend-url http://127.0.0.1:9000/infer
+```
+
+From a source checkout, the complete two-process smoke test is:
+
+```bash
+# terminal 1: example policy service
+uv run uvicorn examples.http_policy_server:app --port 9000
+
+# terminal 2: ActServe control plane
+uv run actserve serve --backend-url http://127.0.0.1:9000/infer
+
+# terminal 3: one observation
+curl -s http://127.0.0.1:8080/v1/actions \
+  -H 'content-type: application/json' \
+  -d '{"session_id":"robot-1","model":"example","sequence_no":1,"deadline_ms":100,"observation":{"frame":1}}'
+```
+
+The example endpoint only echoes observations and is never a valid robot
+policy.
+
+To require authentication on ActServe and authenticate to the backend, put the
+tokens in environment variables and pass only their names:
+
+```bash
+export ACTSERVE_API_KEY='...'
+export POLICY_API_KEY='...'
+actserve serve \
+  --backend-url https://policy.example/infer \
+  --api-key-env ACTSERVE_API_KEY \
+  --backend-token-env POLICY_API_KEY
+```
+
+The service exposes unauthenticated `/healthz` and `/readyz` probes. When an API
+key is configured, `/v1/actions`, `/v1/metrics`, and `/metrics` require a Bearer
+token. Binding to a non-loopback interface remains an explicit operator choice.

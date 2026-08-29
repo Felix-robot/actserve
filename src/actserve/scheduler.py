@@ -71,6 +71,12 @@ class Scheduler:
     async def __aexit__(self, *_: object) -> None:
         await self.close()
 
+    @property
+    def is_accepting(self) -> bool:
+        """Whether the scheduler is running and accepting new requests."""
+
+        return self._accepting and self._worker is not None and not self._worker.done()
+
     async def start(self) -> None:
         if self._worker is not None:
             return
