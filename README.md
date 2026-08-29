@@ -45,7 +45,7 @@ closed-loop serving system needs:
 uv sync --extra dev
 ```
 
-The scheduler core has no runtime dependencies. Python 3.10+ is supported.
+The scheduler core has no runtime dependencies. Python 3.10–3.13 is tested.
 Install from the repository with `pip install "actserve[server] @
 git+https://github.com/Felix-robot/actserve.git"` until a PyPI release is
 published.
