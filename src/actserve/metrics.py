@@ -31,6 +31,7 @@ class MetricsSnapshot:
     unserviceable: int
     replaced: int
     out_of_order: int
+    overloaded: int
     failed: int
     cancelled: int
     mean_batch_size: float
@@ -64,6 +65,7 @@ class MetricsSnapshot:
             "unserviceable": self.unserviceable,
             "replaced": self.replaced,
             "out_of_order": self.out_of_order,
+            "overloaded": self.overloaded,
             "failed": self.failed,
             "cancelled": self.cancelled,
             "mean_batch_size": self.mean_batch_size,
@@ -120,6 +122,7 @@ class SchedulerMetrics:
             unserviceable=self._status[ResultStatus.UNSERVICEABLE],
             replaced=self._status[ResultStatus.REPLACED],
             out_of_order=self._status[ResultStatus.OUT_OF_ORDER],
+            overloaded=self._status[ResultStatus.OVERLOADED],
             failed=self._status[ResultStatus.FAILED],
             cancelled=self._status[ResultStatus.CANCELLED],
             mean_batch_size=0.0 if self.batches == 0 else self.batch_items / self.batches,
@@ -145,6 +148,7 @@ def prometheus_text(snapshot: MetricsSnapshot) -> str:
         "unserviceable",
         "replaced",
         "out_of_order",
+        "overloaded",
         "failed",
         "cancelled",
     }

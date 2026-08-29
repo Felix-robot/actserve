@@ -38,6 +38,7 @@ closed-loop serving system needs:
 - compatible dynamic microbatching;
 - latency-aware batch admission when the backend supplies an estimator;
 - explicit expired, replaced, missed, and failed outcomes;
+- bounded pending queues with explicit retryable overload outcomes;
 - privacy-safe scheduling traces;
 - privacy-safe training phase and bottleneck profiling;
 - backend-neutral integration;

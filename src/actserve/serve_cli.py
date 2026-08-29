@@ -23,6 +23,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dispatch-guard-ms", type=float, default=1.0)
     parser.add_argument("--backend-timeout-ms", type=float, default=30_000)
     parser.add_argument(
+        "--max-pending-requests",
+        type=int,
+        default=1024,
+        help="maximum queued requests before new sessions receive HTTP 429",
+    )
+    parser.add_argument(
         "--api-key-env",
         help="environment variable containing the bearer token required by ActServe",
     )
@@ -57,6 +63,7 @@ def create_server_app(
             max_batch_size=args.max_batch_size,
             max_batch_wait_ms=args.max_batch_wait_ms,
             dispatch_guard_ms=args.dispatch_guard_ms,
+            max_pending_requests=args.max_pending_requests,
         ),
     )
     return create_app(scheduler, api_key=api_key)
@@ -76,6 +83,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not 1 <= args.port <= 65535:
         parser.error("port must be in [1, 65535]")
+    if args.max_pending_requests < 1:
+        parser.error("max-pending-requests must be at least 1")
     try:
         app = create_server_app(args)
     except ValueError as exc:

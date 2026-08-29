@@ -15,6 +15,7 @@ class ResultStatus(str, Enum):
     UNSERVICEABLE = "predicted_deadline_miss"
     REPLACED = "replaced_by_newer_observation"
     OUT_OF_ORDER = "out_of_order_observation"
+    OVERLOADED = "scheduler_overloaded"
     FAILED = "failed"
     CANCELLED = "cancelled"
 
