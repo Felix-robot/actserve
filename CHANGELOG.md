@@ -13,6 +13,11 @@ All notable changes to ActServe are documented here. The project follows
 - Rolling p90 HTTP backend latency estimation by batch size, with configurable
   warm-start floor and safety factor for deadline-aware admission.
 
+### Changed
+
+- GitHub Actions now use pinned Node 24-compatible checkout and uv setup
+  revisions.
+
 ## [0.8.0] - 2026-08-29
 
 ### Added
