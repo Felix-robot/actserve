@@ -1,0 +1,35 @@
+name: Feature request
+description: Propose a reusable serving, training-efficiency, or integration improvement.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: pain
+    attributes:
+      label: User pain
+      description: What concrete workflow is slow, unsafe, or difficult today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed interface
+      description: Show the smallest useful API or CLI example.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation plan
+      description: State the public benchmark, failure cases, and behavior-preservation checks.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Scope boundary
+      options:
+        - label: The proposal can be developed without publishing private research artifacts.
+          required: true
+        - label: Performance evidence will be labeled synthetic, replayed, or real-hardware.
+          required: true

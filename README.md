@@ -1,5 +1,9 @@
 # ActServe
 
+[![CI](https://github.com/Felix-robot/actserve/actions/workflows/ci.yml/badge.svg)](https://github.com/Felix-robot/actserve/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10--3.13-blue.svg)](pyproject.toml)
+
 Deadline-aware inference serving for embodied AI agents.
 
 ActServe treats robot inference as a stream of perishable observations,
@@ -210,14 +214,16 @@ dynamic batches while preserving request, session, model, and sequence identity.
 
 ## Roadmap
 
-- Repeat the public-checkpoint overload comparison across more VLA families.
-- Session-aware vision-feature cache with explicit invalidation.
-- Multi-adapter routing and residency policy.
-- gRPC transport and Prometheus exporter.
+- Adaptive latency estimation and backpressure for HTTP policy backends.
+- Session-aware vision-feature cache with explicit invalidation and parity tests.
+- Public simulator benchmark with pinned model weights, seeds, and task-quality gates.
+- gRPC transport for high-throughput binary observations.
 
 See [`docs/POSITIONING.md`](docs/POSITIONING.md) for the deliberately narrow
 comparison boundary and [`SECURITY.md`](SECURITY.md) before any physical-robot
 integration.
+
+Release history is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 
