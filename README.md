@@ -12,9 +12,9 @@ the earliest control deadline, replaces stale pending frames from the same robot
 microbatches compatible requests, and refuses to return late actions as if they
 were safe successes.
 
-> v0.9 adds bounded backpressure, adaptive HTTP backend latency estimates, and
-> a reproducible real-model SmolVLA benchmark to the v0.8 standalone serving
-> stack. It does not send hardware commands or claim task superiority.
+> v0.10 adds a first-class non-blocking LeRobot SmolVLA backend and standalone
+> serving command to the v0.9 deadline, backpressure, and adaptive-latency
+> control plane. It does not send hardware commands or claim task superiority.
 
 Formal experiments must follow the explicit staged gate in
 [`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md); public benchmark
