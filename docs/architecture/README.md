@@ -33,7 +33,7 @@ it and refreshes only after the new revision passes validation, so a broken
 half-edit does not replace the last good diagram.
 
 ```bash
-git clone --depth 1 --branch v2.13.0 \
+git clone --depth 1 --branch v2.16.0 \
   https://github.com/tt-a1i/archify.git /tmp/archify
 
 node /tmp/archify/archify/bin/archify.mjs preview architecture \
@@ -48,5 +48,5 @@ When the implementation changes, update both the topology and
 HTML, and exported share card together. Archify provides a validated live
 authoring loop; it does not infer architecture changes from code automatically.
 
-Generated with [Archify v2.13.0](https://github.com/tt-a1i/archify), released
+Generated with [Archify v2.16.0](https://github.com/tt-a1i/archify), released
 under the MIT License.
