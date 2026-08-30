@@ -2,6 +2,14 @@
 
 ActServe separates scheduling from model execution.
 
+For an explorable view, open the
+[ActServe v0.10 Archify map](architecture/README.md). The map is generated from
+a versioned JSON specification, links components to public source evidence, and
+includes four guided chapters for the request path, backend boundary, safe
+return path, and optional asynchronous action queue.
+
+![ActServe v0.10 runtime architecture](architecture/actserve-v0.10-share-card.png)
+
 ```text
 robot/simulator clients
         |

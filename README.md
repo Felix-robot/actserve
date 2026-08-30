@@ -20,6 +20,17 @@ Formal experiments must follow the explicit staged gate in
 [`docs/WORKFLOW_INTEGRATION.md`](docs/WORKFLOW_INTEGRATION.md); public benchmark
 success alone never authorizes attachment to an existing job.
 
+## Interactive architecture
+
+[![ActServe v0.10 runtime architecture](docs/architecture/actserve-v0.10-share-card.png)](docs/architecture/README.md)
+
+The [Archify system map](docs/architecture/README.md) traces a fresh robot
+observation through session coalescing, EDF scheduling, deadline-safe
+microbatching, backend execution, fail-closed result validation, and the
+optional asynchronous action queue. Its components link to revision-pinned
+public source files, and the checked-in HTML supports guided views, live trace
+motion, search, route exploration, dark/light themes, and export.
+
 ## The pain it solves
 
 A FIFO model server can spend GPU time on frame 42 even after frame 43 has
