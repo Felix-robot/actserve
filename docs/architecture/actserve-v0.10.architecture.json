@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ActServe v0.10 Runtime Architecture",
+    "subtitle": "Deadline-aware inference serving for perishable robot observations",
+    "output": "actserve-v0.10.html",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Felix-robot/actserve",
+      "revision": "52b92ed90349c32bee1d37e2e55d7f96f101a22c"
+    },
+    "views": [
+      {
+        "id": "request-path",
+        "label": "Fresh observation to batch",
+        "focus": ["robot-clients", "api-sdk", "session-gate", "deadline-scheduler", "microbatcher"],
+        "note": "A fresh observation replaces stale pending work before EDF and latency-aware batch admission."
+      },
+      {
+        "id": "backend-path",
+        "label": "Backend-neutral execution",
+        "focus": ["microbatcher", "backend-adapters", "policy-runtimes"],
+        "note": "One narrow batch contract connects ActServe to SmolVLA, HTTP, embodied.cpp, or custom runtimes."
+      },
+      {
+        "id": "safe-return",
+        "label": "Fail-closed return path",
+        "focus": ["policy-runtimes", "result-gate", "outcomes-metrics", "control-loop"],
+        "note": "Identity mismatches and late actions become explicit outcomes instead of unsafe successes."
+      },
+      {
+        "id": "async-actions",
+        "label": "Optional async actions",
+        "focus": ["outcomes-metrics", "action-queue", "control-loop"],
+        "note": "A per-session queue can decouple action-chunk inference from low-watermark execution."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [40, 150],
+    "cols": 6,
+    "gapX": 86,
+    "gapY": 96,
+    "cellW": 164,
+    "cellH": 72
+  },
+  "components": [
+    {
+      "id": "robot-clients",
+      "type": "external",
+      "label": "Robot / Simulator",
+      "sublabel": "perishable observations",
+      "tag": "session + sequence + deadline",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "api-sdk",
+      "type": "frontend",
+      "label": "API / SDK",
+      "sublabel": "FastAPI or in-process submit",
+      "tag": "auth + shape validation",
+      "sources": [
+        { "path": "src/actserve/server.py", "label": "HTTP API" },
+        { "path": "src/actserve/types.py", "label": "Request types" }
+      ],
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "session-gate",
+      "type": "backend",
+      "label": "Session Gate",
+      "sublabel": "coalesce + reject old sequence",
+      "tag": "bounded pending queue",
+      "sources": [
+        { "path": "src/actserve/scheduler.py", "label": "Admission logic" }
+      ],
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "deadline-scheduler",
+      "type": "backend",
+      "label": "Deadline Scheduler",
+      "sublabel": "EDF + dispatch guard",
+      "tag": "drop expired / unserviceable",
+      "sources": [
+        { "path": "src/actserve/scheduler.py", "label": "EDF scheduler" }
+      ],
+      "row": 0,
+      "col": 3
+    },
+    {
+      "id": "microbatcher",
+      "type": "messagebus",
+      "label": "Microbatcher",
+      "sublabel": "batch key + latency estimate",
+      "tag": "deadline-safe admission",
+      "sources": [
+        { "path": "src/actserve/scheduler.py", "label": "Batch selection" },
+        { "path": "src/actserve/adapter_backend.py", "label": "Adapter batch keys" }
+      ],
+      "row": 0,
+      "col": 4
+    },
+    {
+      "id": "backend-adapters",
+      "type": "backend",
+      "label": "Backend Adapters",
+      "sublabel": "infer_batch(requests)",
+      "tag": "runtime-neutral contract",
+      "sources": [
+        { "path": "src/actserve/backend.py", "label": "Backend protocol" },
+        { "path": "src/actserve/integrations/http_json.py", "label": "HTTP adapter" },
+        { "path": "src/actserve/integrations/embodied_cpp.py", "label": "embodied.cpp adapter" }
+      ],
+      "row": 0,
+      "col": 5
+    },
+    {
+      "id": "policy-runtimes",
+      "type": "external",
+      "label": "Policy Runtimes",
+      "sublabel": "SmolVLA / HTTP / C++ / custom",
+      "tag": "GPU or remote service",
+      "sources": [
+        { "path": "src/actserve/integrations/smolvla.py", "label": "SmolVLA worker" },
+        { "path": "src/actserve/integrations/http_json.py", "label": "Remote JSON policy" },
+        { "path": "src/actserve/integrations/embodied_cpp.py", "label": "ZeroMQ C++ policy" }
+      ],
+      "row": 1,
+      "col": 5
+    },
+    {
+      "id": "result-gate",
+      "type": "security",
+      "label": "Result Safety Gate",
+      "sublabel": "identity + deadline validation",
+      "tag": "fail closed",
+      "sources": [
+        { "path": "src/actserve/scheduler.py", "label": "Result validation" }
+      ],
+      "row": 1,
+      "col": 4
+    },
+    {
+      "id": "outcomes-metrics",
+      "type": "database",
+      "label": "Outcomes + Metrics",
+      "sublabel": "explicit status + latency",
+      "tag": "JSON / Prometheus",
+      "sources": [
+        { "path": "src/actserve/types.py", "label": "Outcome statuses" },
+        { "path": "src/actserve/metrics.py", "label": "Serving metrics" },
+        { "path": "src/actserve/replay.py", "label": "Privacy-safe traces" }
+      ],
+      "row": 1,
+      "col": 3
+    },
+    {
+      "id": "control-loop",
+      "type": "external",
+      "label": "Control Loop",
+      "sublabel": "consume only usable actions",
+      "tag": "robot safety stays outside",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "action-queue",
+      "type": "messagebus",
+      "label": "Async Action Queue",
+      "sublabel": "per-session chunk buffer",
+      "tag": "optional low-water refill",
+      "sources": [
+        { "path": "src/actserve/action_queue.py", "label": "Action queue" }
+      ],
+      "row": 2,
+      "col": 3
+    }
+  ],
+  "connections": [
+    {
+      "id": "observation-request",
+      "from": "robot-clients",
+      "to": "api-sdk",
+      "label": "InferenceRequest",
+      "variant": "emphasis"
+    },
+    {
+      "id": "validated-request",
+      "from": "api-sdk",
+      "to": "session-gate"
+    },
+    {
+      "id": "fresh-pending-work",
+      "from": "session-gate",
+      "to": "deadline-scheduler",
+      "label": "fresh pending"
+    },
+    {
+      "id": "dispatch-candidate",
+      "from": "deadline-scheduler",
+      "to": "microbatcher"
+    },
+    {
+      "id": "compatible-batch",
+      "from": "microbatcher",
+      "to": "backend-adapters",
+      "label": "compatible batch"
+    },
+    {
+      "id": "backend-inference",
+      "from": "backend-adapters",
+      "to": "policy-runtimes",
+      "label": "infer_batch",
+      "labelAt": [1350, 224],
+      "variant": "emphasis"
+    },
+    {
+      "id": "action-chunks",
+      "from": "policy-runtimes",
+      "to": "result-gate",
+      "label": "ActionChunk[]"
+    },
+    {
+      "id": "checked-results",
+      "from": "result-gate",
+      "to": "outcomes-metrics"
+    },
+    {
+      "id": "request-outcome",
+      "from": "outcomes-metrics",
+      "to": "control-loop",
+      "variant": "emphasis"
+    },
+    {
+      "id": "optional-buffer",
+      "from": "outcomes-metrics",
+      "to": "action-queue",
+      "variant": "dashed"
+    },
+    {
+      "id": "queued-action",
+      "from": "action-queue",
+      "to": "control-loop",
+      "label": "next action",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Freshness before throughput",
+      "items": [
+        "New frames replace stale pending work per model/session",
+        "EDF and latency estimates protect the earliest deadline"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Runtime-neutral execution",
+      "items": [
+        "Compatible requests share one backend call",
+        "SmolVLA, HTTP, embodied.cpp, and custom backends keep their execution role"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Explicit safety boundary",
+      "items": [
+        "Late or misidentified actions never masquerade as safe success",
+        "Hardware commands and robot-specific fallback remain outside ActServe"
+      ]
+    }
+  ]
+}
