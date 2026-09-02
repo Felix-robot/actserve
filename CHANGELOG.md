@@ -5,6 +5,11 @@ All notable changes to ActServe are documented here. The project follows
 
 ## [Unreleased]
 
+### Added
+
+- Joint CUDA batch-size and batch-wait sweeps that reuse one model,
+  calibration table, and observation set across every candidate.
+
 ## [0.10.0] - 2026-08-29
 
 ### Added

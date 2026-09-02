@@ -97,14 +97,16 @@ vision-policy benchmark:
 ```bash
 CUDA_VISIBLE_DEVICES=0 actserve benchmark-cuda
 CUDA_VISIBLE_DEVICES=0 actserve benchmark-cuda --batch-sizes 4,8,16
+CUDA_VISIBLE_DEVICES=0 actserve benchmark-cuda \
+  --batch-sizes 4,8,16 --batch-wait-ms-list 0,0.5,1,2,4
 ```
 
 This calibrates batch latency on the current GPU, then compares FIFO batch-1
 against ActServe using the same synthetic ViT-style policy and observation
-stream. A batch-size sweep calibrates once, evaluates every candidate, and
-recommends the ceiling with the most on-time actions before considering p95
-latency and backend calls. It does not download model weights or use private
-task data.
+stream. A joint batch-size/batch-wait sweep calibrates once, reuses the same
+model and frames for every candidate, and recommends the pair with the most
+on-time actions before considering p95 latency and backend calls. It does not
+download model weights or use private task data.
 
 In a 32-session stress run at 60 Hz per session with a 30 ms deadline, FIFO
 produced 291/960 on-time actions while ActServe produced 960/960. ActServe also

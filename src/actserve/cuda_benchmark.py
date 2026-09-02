@@ -206,6 +206,7 @@ async def _run_case(
 
 async def compare(args: argparse.Namespace) -> dict[str, Any]:
     batch_sizes = _parse_batch_sizes(args.batch_sizes, args.max_batch_size)
+    batch_waits = _parse_batch_waits(args.batch_wait_ms_list, args.batch_wait_ms)
     backend = TorchVisionBackend(
         device=args.device,
         max_batch_size=max(batch_sizes),
@@ -239,23 +240,25 @@ async def compare(args: argparse.Namespace) -> dict[str, Any]:
         args.case_timeout_seconds,
     )
     optimized = []
-    for batch_size in batch_sizes:
-        result = await _run_case(
-            f"edf_coalescing_microbatch_{batch_size}",
-            backend,
-            workload,
-            frames,
-            SchedulerConfig(
-                policy="edf",
-                max_batch_wait_ms=args.batch_wait_ms,
-                dispatch_guard_ms=args.dispatch_guard_ms,
-                max_batch_size=batch_size,
-                coalesce_sessions=True,
-            ),
-            args.case_timeout_seconds,
-        )
-        result["configured_max_batch_size"] = batch_size
-        optimized.append(result)
+    for batch_wait_ms in batch_waits:
+        for batch_size in batch_sizes:
+            result = await _run_case(
+                f"edf_coalescing_microbatch_{batch_size}_wait_{batch_wait_ms:g}ms",
+                backend,
+                workload,
+                frames,
+                SchedulerConfig(
+                    policy="edf",
+                    max_batch_wait_ms=batch_wait_ms,
+                    dispatch_guard_ms=args.dispatch_guard_ms,
+                    max_batch_size=batch_size,
+                    coalesce_sessions=True,
+                ),
+                args.case_timeout_seconds,
+            )
+            result["configured_max_batch_size"] = batch_size
+            result["configured_batch_wait_ms"] = batch_wait_ms
+            optimized.append(result)
     recommendation = max(
         optimized,
         key=lambda result: (
@@ -282,6 +285,7 @@ async def compare(args: argparse.Namespace) -> dict[str, Any]:
         "calibrated_p90_guarded_ms": calibration,
         "recommendation": {
             "max_batch_size": recommendation["configured_max_batch_size"],
+            "batch_wait_ms": recommendation["configured_batch_wait_ms"],
             "selection_order": [
                 "completed_on_time desc",
                 "e2e_p95_ms asc",
@@ -304,6 +308,21 @@ def _parse_batch_sizes(value: str | None, default: int) -> list[int]:
     return sizes
 
 
+def _parse_batch_waits(value: str | None, default: float) -> list[float]:
+    if value is None:
+        waits = [float(default)]
+    else:
+        try:
+            waits = sorted({float(item.strip()) for item in value.split(",") if item.strip()})
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(
+                "batch waits must be comma-separated numbers"
+            ) from exc
+    if not waits or waits[0] < 0:
+        raise argparse.ArgumentTypeError("batch waits must be non-negative numbers")
+    return waits
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the public ActServe CUDA benchmark")
     parser.add_argument("--device", default="cuda:0")
@@ -317,6 +336,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="comma-separated batch ceilings to benchmark and rank after one calibration",
     )
     parser.add_argument("--batch-wait-ms", type=float, default=2.0)
+    parser.add_argument(
+        "--batch-wait-ms-list",
+        help="comma-separated waits to benchmark with the same model, calibration, and frames",
+    )
     parser.add_argument("--dispatch-guard-ms", type=float, default=2.0)
     parser.add_argument("--image-size", type=int, default=224)
     parser.add_argument("--width", type=int, default=384)
